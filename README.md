@@ -2,6 +2,16 @@
 
 react 路由切换动画，支持嵌套路由 (nested routers)。
 
+### 安装
+
+使用默认的切换效果（300ms 的左右滑动切换），可以直接通过 npm 安装：
+
+```bash
+npm install react-animated-router --save
+```
+
+如果想要自定义切换效果，可以 fork 本项目，然后自行修改动画时间和效果
+
 ### 如何使用
 
 `AnimatedRouter`是一个标准的 React 组件，将它放入你的项目中，然后在需要支持动画的地方，使用`AnimatedRouter`替换你
@@ -12,7 +22,8 @@ react 路由切换动画，支持嵌套路由 (nested routers)。
 | className     | 字符串，可选 | 如果传入 className 则会添加到动画节点所在容器节点上                                                                                                                       |
 | transitionKey | 字符串，可选 | 即每个页面节点需要的 key 值，如果不传则会使用当前页面地址的 pathname。<br/>该属性可以用于处理路由页面中还有子路由时的情况，用来避免子路由切换会导致父级页面也一块被重载。 |
 
-> 例如，可以对父级路由使用AnimatedRouter时定义使用父级路由path当作key: transitionKey={this.props.location.pathname.split('/').slice(0, 2).join('/')}
+> 例如，可以对父级路由使用 AnimatedRouter 时定义使用父级路由 path 当作 key:
+> transitionKey={this.props.location.pathname.split('/').slice(0, 2).join('/')}
 
 ```javascript
 import React, { Component } from 'react';
