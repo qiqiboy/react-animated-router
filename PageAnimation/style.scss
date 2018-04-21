@@ -1,0 +1,39 @@
+.page-animation-container {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+.page-animation-enter-enter {
+    transform: translate(100%);
+}
+.page-animation-enter-enter-active,
+.page-animation-exit-exit,
+.page-animation-enter-exit {
+    transform: translate(0);
+}
+.page-animation-exit-enter,
+.page-animation-enter-exit-active {
+    transform: translate(-100%);
+}
+.page-animation-exit-enter-active {
+    transform: translate(0);
+}
+.page-animation-exit-exit-active {
+    transform: translate(100%);
+}
+
+.page-animation-exit-exit-active,
+.page-animation-enter-enter-active,
+.page-animation-exit-enter-active,
+.page-animation-enter-exit-active {
+    transition: transform 0.3s linear;
+}
+.page-animation-enter-enter,
+.page-animation-enter-exit,
+.page-animation-exit-enter,
+.page-animation-exit-exit {
+    position: absolute !important;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
