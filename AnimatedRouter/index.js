@@ -4,8 +4,8 @@ import { Switch, withRouter } from 'react-router';
 import PropTypes from 'prop-types';
 import './style.scss';
 
-const HISTORIES_KEY = 'HISTORIES_KEY';
-const histories = (sessionStorage.getItem(HISTORIES_KEY) || '').split(',').filter(Boolean);
+const REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
+const histories = (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
 let timer;
 const isHistoryPush = location => {
     const index = histories.lastIndexOf(location.key);
@@ -19,14 +19,14 @@ const isHistoryPush = location => {
             histories.push(location.key);
         }
 
-        sessionStorage.setItem(TIGER_HISTORIES_KEY, histories.join(','));
+        sessionStorage.setItem(REACT_HISTORIES_KEY, histories.join(','));
     }, 50);
 
     return index < 0;
 };
 
 @withRouter
-class PageAnimation extends Component {
+class AnimatedRouter extends Component {
     static propTypes = {
         className: PropTypes.string,
         transitionKey: PropTypes.any
@@ -52,4 +52,4 @@ class PageAnimation extends Component {
     }
 }
 
-export default PageAnimation;
+export default AnimatedRouter;

@@ -1,0 +1,25 @@
+{
+  "name": "react-animated-router",
+  "version": "0.0.1",
+  "description": "Dynamic transitions with react-router and react-transition-group",
+  "main": "BGM.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://qiqiboy@github.com/qiqiboy/react-animated-router.git"
+  },
+  "author": "qiqiboy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qiqiboy/react-animated-router/issues"
+  },
+  "peerDependencies": {
+    "react": ">15.6.1",
+    "prop-types": ">15.5.10",
+    "react-transition-group": ">2.0.0",
+    "react-router": ">4.0.0"
+  },
+  "homepage": "https://github.com/qiqiboy/react-animated-router#readme"
+}
