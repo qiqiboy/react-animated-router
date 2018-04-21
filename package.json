@@ -1,6 +1,6 @@
 {
   "name": "react-animated-router",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Dynamic transitions with react-router and react-transition-group",
   "main": "./AnimatedRouter.js",
   "scripts": {
