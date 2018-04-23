@@ -3,15 +3,13 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { Switch, withRouter } from 'react-router';
 import PropTypes from 'prop-types';
 
-let throttleTimer;
+let lastLocaton = { isPush: true };
 const REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
 const histories = (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
-const isHistoryPush = location => {
-    const index = histories.lastIndexOf(location.key);
+const isHistoryPush = (location, update) => {
+    if (update && location.key !== lastLocaton.key) {
+        const index = histories.lastIndexOf(location.key);
 
-    clearTimeout(throttleTimer);
-
-    throttleTimer = setTimeout(function() {
         if (index > -1) {
             histories.splice(index + 1);
         } else {
@@ -19,9 +17,14 @@ const isHistoryPush = location => {
         }
 
         sessionStorage.setItem(REACT_HISTORIES_KEY, histories.join(','));
-    }, 50);
 
-    return index < 0;
+        lastLocaton = {
+            isPush: index < 0,
+            key: location.key
+        };
+    }
+
+    return lastLocaton.isPush;
 };
 
 /**
@@ -47,16 +50,18 @@ class AnimatedRouter extends Component {
 
     render() {
         const { className, location, children, timeout, prefix } = this.props;
-        const classNames = prefix + '-' + (isHistoryPush(location) ? 'forward' : 'backward');
 
         return (
             <TransitionGroup
                 className={'animated-router-container' + (className ? ' ' + className : '')}
-                childFactory={child =>
-                    React.cloneElement(child, {
+                childFactory={child => {
+                    const classNames =
+                        prefix + '-' + (isHistoryPush(location, child.props.in) ? 'forward' : 'backward');
+
+                    return React.cloneElement(child, {
                         classNames
-                    })
-                }>
+                    });
+                }}>
                 <CSSTransition
                     key={this.props.transitionKey || location.pathname}
                     addEndListener={(node, done) => {
@@ -71,8 +76,7 @@ class AnimatedRouter extends Component {
                             false
                         );
                     }}
-                    timeout={timeout}
-                    classNames={classNames}>
+                    timeout={timeout}>
                     <Switch location={location}>{children}</Switch>
                 </CSSTransition>
             </TransitionGroup>
