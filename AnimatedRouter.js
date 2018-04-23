@@ -63,7 +63,6 @@ class AnimatedRouter extends Component {
                         node.addEventListener(
                             'transitionend',
                             function(e) {
-                                console.log(e);
                                 //确保动画来自于目标节点
                                 if (e.target === node) {
                                     done();
