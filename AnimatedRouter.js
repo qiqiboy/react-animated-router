@@ -3,28 +3,29 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { Switch, withRouter } from 'react-router';
 import PropTypes from 'prop-types';
 
-let lastLocaton = { isPush: true };
+let lastLocation = { isPush: true };
 const REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
 const histories = (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
 const isHistoryPush = (location, update) => {
-    if (update && location.key !== lastLocaton.key) {
-        const index = histories.lastIndexOf(location.key);
+    const key = location.key || location.pathname + location.search;
+    if (update && key !== lastLocation.key) {
+        const index = histories.lastIndexOf(key);
 
         if (index > -1) {
             histories.splice(index + 1);
         } else {
-            histories.push(location.key);
+            histories.push(key);
         }
 
         sessionStorage.setItem(REACT_HISTORIES_KEY, histories.join(','));
 
-        lastLocaton = {
+        lastLocation = {
             isPush: index < 0,
-            key: location.key
+            key
         };
     }
 
-    return lastLocaton.isPush;
+    return lastLocation.isPush;
 };
 
 /**
