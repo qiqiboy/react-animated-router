@@ -54,7 +54,7 @@ class AnimatedRouter extends Component {
 
         return (
             <TransitionGroup
-                className={'animated-router-container' + (className ? ' ' + className : '')}
+                className={prefix + '-container react-animated-router' + (className ? ' ' + className : '')}
                 childFactory={child => {
                     const classNames =
                         prefix + '-' + (isHistoryPush(location, child.props.in) ? 'forward' : 'backward');
