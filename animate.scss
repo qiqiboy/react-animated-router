@@ -1,48 +1,53 @@
-.animated-router-container { // 动画容器节点，一般不需要修改
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-}
+$prefix: animated-router !default;
 
-/** START: 自定义进出场动画 **/
-.animated-router-forward-enter {
-    transform: translate(100%);
-}
-.animated-router-forward-enter-active {
-    transform: translate(0);
-}
-.animated-router-forward-exit {
-    transform: translate(0);
-}
-.animated-router-forward-exit-active {
-    transform: translate(-100%);
-}
+.#{$prefix} {
+    // 动画容器节点，一般不需要修改
+    &-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+    }
 
-.animated-router-backward-enter {
-    transform: translate(-100%);
-}
-.animated-router-backward-enter-active {
-    transform: translate(0);
-}
-.animated-router-backward-exit {
-    transform: translate(0);
-}
-.animated-router-backward-exit-active {
-    transform: translate(100%);
-}
-/** END **/
+    /** START: 自定义进出场动画 **/
+    &-forward-enter {
+        transform: translate(100%);
+    }
+    &-forward-enter-active {
+        transform: translate(0);
+    }
+    &-forward-exit {
+        transform: translate(0);
+    }
+    &-forward-exit-active {
+        transform: translate(-100%);
+    }
 
-//不同过渡阶段需要的过渡时间与缓动效果
-.animated-router-forward-enter-active,
-.animated-router-forward-exit-active,
-.animated-router-backward-enter-active,
-.animated-router-backward-exit-active {
-    transition: transform 0.3s linear;
-}
-.animated-router-forward-exit,
-.animated-router-backward-exit {
-    position: absolute !important;
-    width: 100%;
-    top: 0;
-    left: 0;
+    &-backward-enter {
+        transform: translate(-100%);
+    }
+    &-backward-enter-active {
+        transform: translate(0);
+    }
+    &-backward-exit {
+        transform: translate(0);
+    }
+    &-backward-exit-active {
+        transform: translate(100%);
+    }
+    /** END **/
+
+    //不同过渡阶段需要的过渡时间与缓动效果
+    &-forward-enter-active,
+    &-forward-exit-active,
+    &-backward-enter-active,
+    &-backward-exit-active {
+        transition: transform 0.3s linear;
+    }
+    &-forward-exit,
+    &-backward-exit {
+        position: absolute !important;
+        width: 100%;
+        top: 0;
+        left: 0;
+    }
 }
