@@ -44,9 +44,9 @@ export { default } from 'react-animated-router'; //直接将react-animated-route
 |   className   | 字符串，可选 |        无         | 如果传入 className 则会添加到动画节点所在容器节点上                                                                                                                                             |
 | transitionKey | 字符串，可选 |        无         | 即每个页面节点需要的 key 值，如果不传则会使用当前页面地址的 pathname。<br/>该属性可以用于处理路由页面中还有子路由时的情况，用来避免子路由切换会导致父级页面也一块被重载。                       |
 |   component   |  布尔，可选  |       'div'       | AnimatedRouter 默认会 render 一个 div 节点，你可以通过该字段修改 render 的节点类型，例如，`component="section"`将会 render `<section>`节点。在 react v16+中，可以传入 `null` 来避免渲染该节点。 |
-|    appear     |  布尔，可选  |       false       | [文档：appear](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-appear)：是否禁用组件首次挂载动画（启用的话将会触发 enter 进场动画）                      |
-|     enter     |  布尔，可选  |       true        | [文档：enter](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-enter)：是否禁用进场动画                                                                   |
-|     exit      |  布尔，可选  |       true        | [文档：exit](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-exit)：是否禁用离场动画                                                                     |
+|    appear     |  布尔，可选  |       false       | [文档：appear](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-appear)：是否启用组件首次挂载动画（启用的话将会触发 enter 进场动画）                      |
+|     enter     |  布尔，可选  |       true        | [文档：enter](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-enter)：是否启用进场动画                                                                   |
+|     exit      |  布尔，可选  |       true        | [文档：exit](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-exit)：是否启用离场动画                                                                     |
 
 > 例如，可以对父级路由使用 AnimatedRouter 时定义使用父级路由 path 当作 key:
 > transitionKey={this.props.location.pathname.split('/').slice(0, 2).join('/')}
