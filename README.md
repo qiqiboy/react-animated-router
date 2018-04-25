@@ -99,14 +99,14 @@ render(
 
 默认的 classNames 如下，如果你设置了 prefix，则名称会变为 `{prefix}-forward` / `{prefix}-backward`。
 
-| classNames               | 类型               |
+| classNames               | 解释               |
 | ------------------------ | ------------------ |
 | animated-router-forward  | 页面前进时动画效果 |
 | animated-router-backward | 页面后退时动画效果 |
 
 同时，如果没有设置`componnt={null}`的话，AnimateRouter 将会渲染一个路由页面容器节点，该节点会有一些 className，可以用来辅助做动画定义。
 
-| 容器节点 className            | 类型                                                           |
+| 容器节点 className            | 解释                                                           |
 | ----------------------------- | -------------------------------------------------------------- |
 | animated-router-container     | 总是存在                                                       |
 | animated-router-in-transition | 路由动画进行中时存在，可以用来设置动画切换中的一些节点样式设置 |
