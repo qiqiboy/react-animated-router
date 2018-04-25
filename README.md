@@ -37,16 +37,16 @@ export { default } from 'react-animated-router'; //直接将react-animated-route
 
 `AnimatedRouter`是一个标准的 React 组件，类似`react-router`中的`Switch`，将它放入你的项目中，然后在需要支持动画的地方，使用`AnimatedRouter`替换你的`Switch`组件即可。
 
-|     属性      |     类型     |      默认值       | 描述                                                                                                                                                                                                 |
-| :-----------: | :----------: | :---------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|    prefix     | 字符串，可选 | `animated-router` | 应用到 CSSTransition 组件的 classNames 前缀。如果要在同一个项目中使用不同的动画，可以通过设置前缀来定义不同的动画。关于如何自定义动画，请查看下方说明                                                |
-|    timeout    |  数字，可选  |        无         | 动画持续时间（毫秒），可以不传，默认为监听 transitionend 时间来判断动画结束。如果有动画异常，可以尝试设置该值，需要注意的是，该值应该与动画样式中定义的过渡时间一致                                  |
-|   className   | 字符串，可选 |        无         | 如果传入 className 则会添加到动画节点所在容器节点上                                                                                                                                                  |
-| transitionKey | 字符串，可选 |        无         | 即每个页面节点需要的 key 值，如果不传则会使用当前页面地址的 pathname。<br/>该属性可以用于处理路由页面中还有子路由时的情况，用来避免子路由切换会导致父级页面也一块被重载。                            |
+|     属性      |     类型     |      默认值       | 描述                                                                                                                                                                                            |
+| :-----------: | :----------: | :---------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|    prefix     | 字符串，可选 | `animated-router` | 应用到 CSSTransition 组件的 classNames 前缀。如果要在同一个项目中使用不同的动画，可以通过设置前缀来定义不同的动画。关于如何自定义动画，请查看下方说明                                           |
+|    timeout    |  数字，可选  |        无         | 动画持续时间（毫秒），可以不传，默认为监听 transitionend 时间来判断动画结束。如果有动画异常，可以尝试设置该值，需要注意的是，该值应该与动画样式中定义的过渡时间一致                             |
+|   className   | 字符串，可选 |        无         | 如果传入 className 则会添加到动画节点所在容器节点上                                                                                                                                             |
+| transitionKey | 字符串，可选 |        无         | 即每个页面节点需要的 key 值，如果不传则会使用当前页面地址的 pathname。<br/>该属性可以用于处理路由页面中还有子路由时的情况，用来避免子路由切换会导致父级页面也一块被重载。                       |
 |   component   |  布尔，可选  |       'div'       | AnimatedRouter 默认会 render 一个 div 节点，你可以通过该字段修改 render 的节点类型，例如，`component="section"`将会 render `<section>`节点。在 react v16+中，可以传入 `null` 来避免渲染该节点。 |
-|    appear     |  布尔，可选  |       false       | [文档：appear](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-appear)：是否禁用组件首次挂载动画（启用的话将会触发 enter 进场动画）                           |
-|     enter     |  布尔，可选  |       true        | [文档：enter](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-enter)：是否禁用进场动画                                                                        |
-|     exit      |  布尔，可选  |       true        | [文档：exit](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-exit)：是否禁用离场动画                                                                          |
+|    appear     |  布尔，可选  |       false       | [文档：appear](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-appear)：是否禁用组件首次挂载动画（启用的话将会触发 enter 进场动画）                      |
+|     enter     |  布尔，可选  |       true        | [文档：enter](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-enter)：是否禁用进场动画                                                                   |
+|     exit      |  布尔，可选  |       true        | [文档：exit](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-exit)：是否禁用离场动画                                                                     |
 
 > 例如，可以对父级路由使用 AnimatedRouter 时定义使用父级路由 path 当作 key:
 > transitionKey={this.props.location.pathname.split('/').slice(0, 2).join('/')}
@@ -99,12 +99,17 @@ render(
 
 默认的 classNames 如下，如果你设置了 prefix，则名称会变为 `{prefix}-forward` / `{prefix}-backward`。
 
-| classNames                    | 类型                                                        |
-| ----------------------------- | ----------------------------------------------------------- |
-| animated-router-container     | 路由动画节点容器节点，如果设置`componnt={null}`将没有该节点 |
-| animated-router-in-transition | 路由动画进行中时，可以用来设置动画切换中的一些节点样式设置  |
-| animated-router-forward       | 页面前进时动画效果                                          |
-| animated-router-backward      | 页面后退时动画效果                                          |
+| classNames               | 类型               |
+| ------------------------ | ------------------ |
+| animated-router-forward  | 页面前进时动画效果 |
+| animated-router-backward | 页面后退时动画效果 |
+
+同时，如果没有设置`componnt={null}`的话，AnimateRouter 将会渲染一个路由页面容器节点，该节点会有一些 className，可以用来辅助做动画定义。
+
+| 容器节点 className            | 类型                                                           |
+| ----------------------------- | -------------------------------------------------------------- |
+| animated-router-container     | 总是存在                                                       |
+| animated-router-in-transition | 路由动画进行中时存在，可以用来设置动画切换中的一些节点样式设置 |
 
 ---
 
