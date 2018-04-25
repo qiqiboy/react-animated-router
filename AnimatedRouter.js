@@ -42,19 +42,60 @@ class AnimatedRouter extends Component {
         className: PropTypes.string,
         transitionKey: PropTypes.any,
         timeout: PropTypes.number,
-        prefix: PropTypes.string
+        prefix: PropTypes.string,
+        appear: PropTypes.bool,
+        enter: PropTypes.bool,
+        exit: PropTypes.bool,
+        component: PropTypes.any
     };
 
     static defaultProps = {
         prefix: 'animated-router'
     };
 
+    state = {
+        inTransition: false
+    };
+
+    onEnter = () => {
+        this.setState({
+            inTransition: true
+        });
+    };
+
+    onEntered = () => {
+        this.setState({
+            inTransition: false
+        });
+    };
+
     render() {
-        const { className, location, children, timeout, prefix } = this.props;
+        const { className, location, children, timeout, prefix, appear, enter, exit, component } = this.props;
+        const groupProps = {
+            appear,
+            enter,
+            exit,
+            component
+        };
+        const cssProps =
+            enter === false
+                ? {
+                      onExit: this.onEnter,
+                      onExited: this.onEntered
+                  }
+                : {
+                      onEnter: this.onEnter,
+                      onEntered: this.onEntered
+                  };
+        const cls = [prefix + '-container', 'react-animated-router', className];
+
+        if (this.state.inTransition) {
+            cls.push(prefix + '-in-transition');
+        }
 
         return (
             <TransitionGroup
-                className={prefix + '-container react-animated-router' + (className ? ' ' + className : '')}
+                className={cls.filter(Boolean).join(' ')}
                 childFactory={child => {
                     const classNames =
                         prefix + '-' + (isHistoryPush(location, child.props.in) ? 'forward' : 'backward');
@@ -62,7 +103,8 @@ class AnimatedRouter extends Component {
                     return React.cloneElement(child, {
                         classNames
                     });
-                }}>
+                }}
+                {...groupProps}>
                 <CSSTransition
                     key={this.props.transitionKey || location.pathname}
                     addEndListener={(node, done) => {
@@ -77,7 +119,8 @@ class AnimatedRouter extends Component {
                             false
                         );
                     }}
-                    timeout={timeout}>
+                    timeout={timeout}
+                    {...cssProps}>
                     <Switch location={location}>{children}</Switch>
                 </CSSTransition>
             </TransitionGroup>

@@ -1,8 +1,12 @@
 $prefix: animated-router !default;
 
 .#{$prefix} {
-    // 动画容器节点，一般不需要修改
     &-container {
+        /* 动画容器节点 */
+    }
+
+    &-in-transition {
+        /* 页面动画中 */
         position: relative;
         width: 100%;
         overflow: hidden;
@@ -36,11 +40,11 @@ $prefix: animated-router !default;
     }
     /** END **/
 
-    //不同过渡阶段需要的过渡时间与缓动效果
     &-forward-enter-active,
     &-forward-exit-active,
     &-backward-enter-active,
     &-backward-exit-active {
+        /* 不同过渡阶段需要的过渡时间与缓动效果 */
         transition: transform 0.3s linear;
     }
     &-forward-exit,
