@@ -57,17 +57,17 @@ class AnimatedRouter extends Component {
         inTransition: false
     };
 
-    onEnter = () => {
+    onEnter = () =>
+        this.state.inTransition ||
         this.setState({
             inTransition: true
         });
-    };
 
-    onEntered = () => {
+    onEntered = () =>
+        !this.state.inTransition ||
         this.setState({
             inTransition: false
         });
-    };
 
     render() {
         const { className, location, children, timeout, prefix, appear, enter, exit, component } = this.props;
@@ -77,16 +77,12 @@ class AnimatedRouter extends Component {
             exit,
             component
         };
-        const cssProps =
-            enter === false
-                ? {
-                      onExit: this.onEnter,
-                      onExited: this.onEntered
-                  }
-                : {
-                      onEnter: this.onEnter,
-                      onEntered: this.onEntered
-                  };
+        const cssProps = {
+            onExit: this.onEnter,
+            onExited: this.onEntered,
+            onEnter: this.onEnter,
+            onEntered: this.onEntered
+        };
         const cls = [prefix + '-container', 'react-animated-router', className];
 
         if (this.state.inTransition) {
