@@ -111,6 +111,11 @@ render(
 | animated-router-container     | 总是存在                                                       |
 | animated-router-in-transition | 路由动画进行中时存在，可以用来设置动画切换中的一些节点样式设置 |
 
+### FAQ
+
+*   **Q: 动画执行异常？**
+    A: 可以尝试设置 timeout 属性，并保持与动画样式中定义的过渡时间一致（默认的 animate.scss 中为 300）
+
 ---
 
 更多说明以及我在探索路由动画应用中所遇到的坑，可以阅读我的[博客文章](http://www.qiqiboy.com/post/111)。

@@ -64,7 +64,7 @@ class AnimatedRouter extends Component {
         });
 
     onEntered = () =>
-        !this.state.inTransition ||
+        this.state.inTransition &&
         this.setState({
             inTransition: false
         });
@@ -115,6 +115,7 @@ class AnimatedRouter extends Component {
                             false
                         );
                     }}
+                    unmountOnExit={true}
                     timeout={timeout}
                     {...cssProps}>
                     <Switch location={location}>{children}</Switch>
