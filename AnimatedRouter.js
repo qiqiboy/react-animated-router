@@ -53,22 +53,7 @@ class AnimatedRouter extends Component {
         prefix: 'animated-router'
     };
 
-    state = {
-        inTransition: false
-    };
-
-    onEnter = () =>
-        this.state.inTransition ||
-        this.setState({
-            inTransition: true
-        });
-
     onEntered = node => {
-        this.state.inTransition &&
-            this.setState({
-                inTransition: false
-            });
-
         if (node) {
             //remove all transition classNames
             node.className = node.className
@@ -87,16 +72,10 @@ class AnimatedRouter extends Component {
             component
         };
         const cssProps = {
-            onExit: this.onEnter,
             onExited: this.onEntered,
-            onEnter: this.onEnter,
             onEntered: this.onEntered
         };
         const cls = [prefix + '-container', 'react-animated-router', className];
-
-        if (this.state.inTransition) {
-            cls.push(prefix + '-in-transition');
-        }
 
         return (
             <TransitionGroup

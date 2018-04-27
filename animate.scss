@@ -3,10 +3,6 @@ $prefix: animated-router !default;
 .#{$prefix} {
     &-container {
         /* 动画容器节点 */
-    }
-
-    &-in-transition {
-        /* 页面动画中 */
         position: relative;
         width: 100%;
         overflow: hidden;
