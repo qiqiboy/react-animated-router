@@ -69,11 +69,13 @@ class AnimatedRouter extends Component {
                 inTransition: false
             });
 
-        //remove all transition classNames
-        node.className = node.className
-            .split(' ')
-            .filter(name => !/-(?:forward|backward)-(?:enter|exit)(?:-active)?$/.test(name))
-            .join(' ');
+        if (node) {
+            //remove all transition classNames
+            node.className = node.className
+                .split(' ')
+                .filter(name => !/-(?:forward|backward)-(?:enter|exit)(?:-active)?$/.test(name))
+                .join(' ');
+        }
     };
 
     render() {
