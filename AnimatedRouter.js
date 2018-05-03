@@ -64,8 +64,6 @@ class AnimatedRouter extends Component {
                 .filter(name => name !== inName)
                 .concat(isAdd ? inName : [])
                 .join(' ');
-
-            console.log(this.rootNode.className);
         }
     }
 
