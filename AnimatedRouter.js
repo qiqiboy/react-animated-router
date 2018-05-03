@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { Switch, withRouter } from 'react-router';
 import PropTypes from 'prop-types';
@@ -53,15 +54,38 @@ class AnimatedRouter extends Component {
         prefix: 'animated-router'
     };
 
+    inTransition = false;
+
+    setInTransition(isAdd) {
+        if (this.rootNode) {
+            const inName = this.props.prefix + '-in-transition';
+            this.rootNode.className = this.rootNode.className
+                .split(/\s+/)
+                .filter(name => name !== inName)
+                .concat(isAdd ? inName : [])
+                .join(' ');
+
+            console.log(this.rootNode.className);
+        }
+    }
+
+    onEnter = () => this.inTransition || this.setInTransition((this.inTransition = true));
+
     onEntered = node => {
+        this.inTransition && this.setInTransition((this.inTransition = false));
+
         if (node) {
             //remove all transition classNames
             node.className = node.className
-                .split(' ')
+                .split(/\s+/)
                 .filter(name => !/-(?:forward|backward)-(?:enter|exit)(?:-active)?$/.test(name))
                 .join(' ');
         }
     };
+
+    componentDidMount() {
+        this.rootNode = findDOMNode(this);
+    }
 
     render() {
         const { className, location, children, timeout, prefix, appear, enter, exit, component } = this.props;
@@ -72,7 +96,9 @@ class AnimatedRouter extends Component {
             component
         };
         const cssProps = {
+            onExit: this.onEnter,
             onExited: this.onEntered,
+            onEnter: this.onEnter,
             onEntered: this.onEntered
         };
         const cls = [prefix + '-container', 'react-animated-router', className];
