@@ -67,10 +67,15 @@ class AnimatedRouter extends Component {
         }
     }
 
-    onEnter = () => this.inTransition || this.setInTransition((this.inTransition = true));
+    onEnter = node => {
+        this.inTransition || this.setInTransition((this.inTransition = true));
+        this.lastTransitionNode = node;
+    };
 
     onEntered = node => {
-        this.inTransition && this.setInTransition((this.inTransition = false));
+        if (this.lastTransitionNode === node) {
+            this.inTransition && this.setInTransition((this.inTransition = false));
+        }
 
         if (node) {
             //remove all transition classNames
