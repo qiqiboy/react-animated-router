@@ -9,6 +9,7 @@ const REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
 const histories = (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
 const isHistoryPush = (location, update) => {
     const key = location.key || location.pathname + location.search;
+
     if (update && key !== lastLocation.key) {
         const index = histories.lastIndexOf(key);
 
@@ -59,6 +60,7 @@ class AnimatedRouter extends Component {
     setInTransition(isAdd) {
         if (this.rootNode) {
             const inName = this.props.prefix + '-in-transition';
+
             this.rootNode.className = this.rootNode.className
                 .split(/\s+/)
                 .filter(name => name !== inName)
@@ -72,17 +74,33 @@ class AnimatedRouter extends Component {
         this.lastTransitionNode = node;
     };
 
+    onEntering = node => {
+        const { timeout } = this.props;
+
+        if (node && typeof timeout === 'number') {
+            node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
+                this.props.timeout + 'ms';
+        }
+    };
+
     onEntered = node => {
         if (this.lastTransitionNode === node) {
             this.inTransition && this.setInTransition((this.inTransition = false));
         }
 
         if (node) {
-            //remove all transition classNames
+            const { timeout } = this.props;
+
+            // remove all transition classNames
             node.className = node.className
                 .split(/\s+/)
                 .filter(name => !/-(?:forward|backward)-(?:enter|exit)(?:-active)?$/.test(name))
                 .join(' ');
+
+            if (typeof timeout === 'number') {
+                node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
+                    '';
+            }
         }
     };
 
@@ -100,8 +118,10 @@ class AnimatedRouter extends Component {
         };
         const cssProps = {
             onExit: this.onEnter,
+            onExiting: this.onEntering,
             onExited: this.onEntered,
             onEnter: this.onEnter,
+            onEntering: this.onEntering,
             onEntered: this.onEntered
         };
         const cls = [prefix + '-container', 'react-animated-router', className];
@@ -124,7 +144,7 @@ class AnimatedRouter extends Component {
                         node.addEventListener(
                             'transitionend',
                             function(e) {
-                                //确保动画来自于目标节点
+                                // 确保动画来自于目标节点
                                 if (e.target === node) {
                                     done();
                                 }
