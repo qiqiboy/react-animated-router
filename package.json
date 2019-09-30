@@ -1,6 +1,6 @@
 {
   "name": "react-animated-router",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Dynamic transitions with react-router and react-transition-group",
   "author": "qiqiboy",
   "main": "dist/index.cjs.js",
@@ -15,6 +15,7 @@
   "files": [
     "LICENSE",
     "README.md",
+    "animate.css",
     "dist/",
     "src/"
   ],
