@@ -1,26 +1,153 @@
 {
   "name": "react-animated-router",
-  "version": "0.1.12",
+  "version": "0.2.0",
   "description": "Dynamic transitions with react-router and react-transition-group",
-  "main": "./AnimatedRouter.js",
+  "author": "qiqiboy",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/AnimatedRouter.d.ts",
+  "engines": {
+    "node": ">=8.0.0",
+    "tiger-new": "4.1.9"
+  },
+  "entryFile": "src/AnimatedRouter.tsx",
+  "exportName": "react-animated-router",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist/",
+    "src/"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run lint && npm run clear && npm run build:declaration && npm run build:bundle",
+    "build:bundle": "rollup -c",
+    "build:declaration": "tsc --emitDeclarationOnly",
+    "clear": "rimraf dist",
+    "lint": "node_modules/.bin/eslint 'src/**/*.{js,jsx,ts,tsx}'"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ],
+  "husky": {
+    "hooks": {
+      "commit-msg": "node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS",
+      "pre-commit": "lint-staged"
+    }
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "subject-case": [
+        0
+      ],
+      "scope-case": [
+        0
+      ]
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "prettier": {
+    "printWidth": 120,
+    "tabWidth": 4,
+    "trailingComma": "none",
+    "jsxBracketSameLine": true,
+    "semi": true,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.json",
+        "options": {
+          "tabWidth": 2
+        }
+      }
+    ]
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,mjs,ts,tsx}": [
+      "node_modules/.bin/prettier --write",
+      "node_modules/.bin/eslint --fix",
+      "git add"
+    ],
+    "src/**/*.{css,scss,less,json,html,md}": [
+      "node_modules/.bin/prettier --write",
+      "git add"
+    ]
+  },
+  "stylelint": {
+    "extends": "stylelint-config-recommended"
+  },
+  "peerDependencies": {
+    "@babel/runtime": ">7.0.0",
+    "react": ">16.0.0",
+    "react-dom": ">16.0.0",
+    "prop-types": ">15.5.0",
+    "react-transition-group": ">2.0.0",
+    "react-router": ">4.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://qiqiboy@github.com/qiqiboy/react-animated-router.git"
+    "url": "https://qiqiboy@github.com/qiqiboy/react-animated-router.git"
   },
-  "author": "qiqiboy",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/qiqiboy/react-animated-router/issues"
   },
-  "peerDependencies": {
-    "react": ">15.6.1",
-    "react-dom": ">15.6.1",
-    "prop-types": ">15.5.10",
-    "react-transition-group": ">2.0.0",
-    "react-router": ">4.0.0"
-  },
-  "homepage": "https://github.com/qiqiboy/react-animated-router#readme"
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "7.6.2",
+    "@babel/core": "7.6.2",
+    "@commitlint/cli": "8.2.0",
+    "@commitlint/config-conventional": "8.2.0",
+    "@types/node": "11.13.21",
+    "@types/prop-types": "^15.7.3",
+    "@types/react": "^16.9.3",
+    "@types/react-dom": "^16.9.1",
+    "@types/react-is": "16.7.1",
+    "@types/react-router-dom": "^5.1.0",
+    "@types/react-transition-group": "^4.2.2",
+    "@typescript-eslint/eslint-plugin": "2.3.1",
+    "@typescript-eslint/parser": "2.3.1",
+    "babel-eslint": "10.0.3",
+    "babel-preset-react-app": "9.0.2",
+    "eslint": "6.5.0",
+    "eslint-config-react-app": "5.0.2",
+    "eslint-plugin-flowtype": "4.3.0",
+    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-jsx-a11y": "6.2.3",
+    "eslint-plugin-react": "7.14.3",
+    "eslint-plugin-react-hooks": "2.1.1",
+    "husky": "2.7.0",
+    "lint-staged": "8.2.1",
+    "prettier": "1.18.2",
+    "prop-types": "^15.7.2",
+    "react": "^16.10.1",
+    "react-dom": "^16.10.1",
+    "react-router-dom": "^5.1.1",
+    "react-transition-group": "^4.3.0",
+    "rimraf": "2.6.3",
+    "rollup": "1.22.0",
+    "rollup-plugin-babel": "4.3.3",
+    "rollup-plugin-commonjs": "10.1.0",
+    "rollup-plugin-copy": "1.1.0",
+    "rollup-plugin-filesize": "6.2.0",
+    "rollup-plugin-node-resolve": "5.2.0",
+    "rollup-plugin-replace": "2.2.0",
+    "rollup-plugin-sass": "1.2.2",
+    "rollup-plugin-sourcemaps": "0.4.2",
+    "rollup-plugin-terser": "4.0.4",
+    "typescript": "3.6.3"
+  }
 }

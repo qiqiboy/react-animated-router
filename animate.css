@@ -1,0 +1,48 @@
+@charset "UTF-8";
+.animated-router {
+  /** START: 自定义进出场动画 **/
+  /** END **/
+}
+.animated-router-container {
+  /* 动画容器节点 */
+}
+.animated-router-in-transition {
+  /* 页面动画中 */
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.animated-router-forward-enter {
+  transform: translate(100%);
+}
+.animated-router-forward-enter-active {
+  transform: translate(0);
+}
+.animated-router-forward-exit {
+  transform: translate(0);
+}
+.animated-router-forward-exit-active {
+  transform: translate(-100%);
+}
+.animated-router-backward-enter {
+  transform: translate(-100%);
+}
+.animated-router-backward-enter-active {
+  transform: translate(0);
+}
+.animated-router-backward-exit {
+  transform: translate(0);
+}
+.animated-router-backward-exit-active {
+  transform: translate(100%);
+}
+.animated-router-forward-enter-active, .animated-router-forward-exit-active, .animated-router-backward-enter-active, .animated-router-backward-exit-active {
+  /* 不同过渡阶段需要的过渡时间与缓动效果 */
+  transition: transform 0.3s linear;
+}
+.animated-router-forward-exit, .animated-router-backward-exit {
+  position: absolute !important;
+  width: 100%;
+  top: 0;
+  left: 0;
+}

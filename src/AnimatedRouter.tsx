@@ -1,10 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component, ReactType } from 'react';
 import { findDOMNode } from 'react-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { Switch, withRouter } from 'react-router';
+import { TransitionActions } from 'react-transition-group/Transition';
+import { Switch, withRouter, RouteComponentProps } from 'react-router';
 import PropTypes from 'prop-types';
+import './animate.scss';
 
-let lastLocation = { isPush: true };
+let lastLocation: { key: string; isPush: boolean } = { key: '', isPush: true };
 const REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
 const histories = (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
 const isHistoryPush = (location, update) => {
@@ -30,6 +32,14 @@ const isHistoryPush = (location, update) => {
     return lastLocation.isPush;
 };
 
+interface AnimatedRouterProps extends TransitionActions {
+    className?: string;
+    transitionKey?: string | number;
+    timeout?: number;
+    prefix?: string;
+    component?: ReactType;
+}
+
 /**
  * @desc 路由动画组件
  * @author qiqiboy
@@ -38,8 +48,7 @@ const isHistoryPush = (location, update) => {
  *  import AnimatedRouter from 'react-animated-router';
  *  import 'react-animated-router/animate.css';
  */
-@withRouter
-class AnimatedRouter extends Component {
+class AnimatedRouter extends Component<AnimatedRouterProps & RouteComponentProps> {
     static propTypes = {
         className: PropTypes.string,
         transitionKey: PropTypes.any,
@@ -56,13 +65,15 @@ class AnimatedRouter extends Component {
     };
 
     inTransition = false;
+    rootNode: Element;
+    lastTransitionNode: Element;
 
     setInTransition(isAdd) {
         if (this.rootNode) {
             const inName = this.props.prefix + '-in-transition';
 
-            this.rootNode.className = this.rootNode.className
-                .split(/\s+/)
+            this.rootNode.className = this.rootNode
+                .className!.split(/\s+/)
                 .filter(name => name !== inName)
                 .concat(isAdd ? inName : [])
                 .join(' ');
@@ -79,7 +90,7 @@ class AnimatedRouter extends Component {
 
         if (node && typeof timeout === 'number') {
             node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
-                this.props.timeout + 'ms';
+                timeout + 'ms';
         }
     };
 
@@ -105,7 +116,7 @@ class AnimatedRouter extends Component {
     };
 
     componentDidMount() {
-        this.rootNode = findDOMNode(this);
+        this.rootNode = findDOMNode(this) as Element;
     }
 
     render() {
@@ -153,7 +164,7 @@ class AnimatedRouter extends Component {
                         );
                     }}
                     unmountOnExit={true}
-                    timeout={timeout}
+                    timeout={timeout as any}
                     {...cssProps}>
                     <Switch location={location}>{children}</Switch>
                 </CSSTransition>
@@ -162,4 +173,4 @@ class AnimatedRouter extends Component {
     }
 }
 
-export default AnimatedRouter;
+export default withRouter(AnimatedRouter);

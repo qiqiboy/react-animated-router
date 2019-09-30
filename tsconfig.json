@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "ESNext",
+    "lib": ["esnext", "dom"],
+    "jsx": "react",
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": false,
+    "importHelpers": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true,
+    "importHelpers": true,
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "build"]
+}
