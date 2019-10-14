@@ -8,7 +8,7 @@ interface AnimatedRouterProps extends TransitionActions {
     transitionKey?: string | number;
     timeout?: number;
     prefix?: string;
-    component?: ReactType;
+    component?: ReactType | null;
 }
 /**
  * @desc 路由动画组件

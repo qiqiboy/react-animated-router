@@ -6,7 +6,7 @@ import { Switch, withRouter, RouteComponentProps } from 'react-router';
 import PropTypes from 'prop-types';
 import './animate.scss';
 
-let lastLocation: { key: string; isPush: boolean } = { key: '', isPush: true };
+let lastLocation = { key: '', isPush: true };
 const REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
 const histories = (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
 const isHistoryPush = (location, update) => {
@@ -37,7 +37,7 @@ interface AnimatedRouterProps extends TransitionActions {
     transitionKey?: string | number;
     timeout?: number;
     prefix?: string;
-    component?: ReactType;
+    component?: ReactType | null;
 }
 
 /**
