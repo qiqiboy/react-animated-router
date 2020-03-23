@@ -16,7 +16,7 @@ const pkg = require('./package.json');
  * 如果希望将某些模块代码直接构建进输出文件，可以再这里指定这些模块名称
  */
 const externalExclude = [
-    /*'@babel/runtime', 'regenerator-runtime'*/
+    '@babel/runtime', 'regenerator-runtime'
 ];
 
 const exportName = pkg.exportName || pkg.name.split('/').slice(-1)[0];
