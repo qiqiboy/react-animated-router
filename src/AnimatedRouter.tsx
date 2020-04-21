@@ -6,10 +6,16 @@ import { Switch, withRouter, RouteComponentProps } from 'react-router';
 import PropTypes from 'prop-types';
 import './animate.scss';
 
+const isSSR = typeof window === 'undefined';
+
 let lastLocation = { key: '', isPush: true };
 const REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
-const histories = (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
+const histories = isSSR ? [] : (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
 const isHistoryPush = (location, update) => {
+    if (isSSR) {
+        return true;
+    }
+
     const key = location.key || location.pathname + location.search;
 
     if (update && key !== lastLocation.key) {
@@ -120,6 +126,10 @@ class AnimatedRouter extends Component<AnimatedRouterProps & RouteComponentProps
     }
 
     render() {
+        if (isSSR) {
+            return <Switch>{this.props.children}</Switch>;
+        }
+
         const { className, location, children, timeout, prefix, appear, enter, exit, component } = this.props;
         const groupProps = {
             appear,

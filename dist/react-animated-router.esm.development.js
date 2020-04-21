@@ -89,14 +89,19 @@ function _inherits(subClass, superClass) {
   if (superClass) _setPrototypeOf(subClass, superClass);
 }
 
+var isSSR = typeof window === 'undefined';
 var lastLocation = {
   key: '',
   isPush: true
 };
 var REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
-var histories = (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
+var histories = isSSR ? [] : (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
 
 var isHistoryPush = function isHistoryPush(location, update) {
+  if (isSSR) {
+    return true;
+  }
+
   var key = location.key || location.pathname + location.search;
 
   if (update && key !== lastLocation.key) {
@@ -199,6 +204,10 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
+      if (isSSR) {
+        return React.createElement(Switch, null, this.props.children);
+      }
+
       var _this$props = this.props,
           className = _this$props.className,
           location = _this$props.location,
