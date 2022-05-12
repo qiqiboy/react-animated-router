@@ -1,9 +1,9 @@
-import React, { Component, ReactType } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { findDOMNode } from 'react-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import { Routes, useLocation } from 'react-router';
 import { TransitionActions } from 'react-transition-group/Transition';
-import { Switch, withRouter, RouteComponentProps } from 'react-router';
-import PropTypes from 'prop-types';
+
 import './animate.scss';
 
 const isSSR = typeof window === 'undefined';
@@ -43,7 +43,8 @@ interface AnimatedRouterProps extends TransitionActions {
     transitionKey?: string | number;
     timeout?: number;
     prefix?: string;
-    component?: ReactType | null;
+    component?: React.ElementType | null;
+    children: React.ReactNode;
 }
 
 /**
@@ -54,60 +55,48 @@ interface AnimatedRouterProps extends TransitionActions {
  *  import AnimatedRouter from 'react-animated-router';
  *  import 'react-animated-router/animate.css';
  */
-class AnimatedRouter extends Component<AnimatedRouterProps & RouteComponentProps> {
-    static propTypes = {
-        className: PropTypes.string,
-        transitionKey: PropTypes.any,
-        timeout: PropTypes.number,
-        prefix: PropTypes.string,
-        appear: PropTypes.bool,
-        enter: PropTypes.bool,
-        exit: PropTypes.bool,
-        component: PropTypes.any
-    };
+const AnimatedRouter: React.FC<AnimatedRouterProps> = props => {
+    const self = useRef<{
+        inTransition: boolean;
+        rootNode: HTMLElement | null;
+        lastTransitionNode: HTMLElement | null;
+    }>({ inTransition: false, rootNode: null, lastTransitionNode: null }).current;
+    const rootNodeRef = useRef<TransitionGroup>(null);
+    const { className, children, timeout, prefix, appear, enter, exit, component, transitionKey } = props;
+    const location = useLocation();
 
-    static defaultProps = {
-        prefix: 'animated-router'
-    };
+    const setInTransition = (isAdd: boolean) => {
+        if (self.rootNode) {
+            const inName = `${prefix}-in-transition`;
 
-    inTransition = false;
-    rootNode: Element;
-    lastTransitionNode: Element;
-
-    setInTransition(isAdd) {
-        if (this.rootNode) {
-            const inName = this.props.prefix + '-in-transition';
-
-            this.rootNode.className = this.rootNode
+            self.rootNode.className = self.rootNode
                 .className!.split(/\s+/)
                 .filter(name => name !== inName)
                 .concat(isAdd ? inName : [])
                 .join(' ');
         }
-    }
-
-    onEnter = node => {
-        this.inTransition || this.setInTransition((this.inTransition = true));
-        this.lastTransitionNode = node;
     };
 
-    onEntering = node => {
-        const { timeout } = this.props;
+    const onEnter = node => {
+        self.inTransition || setInTransition((self.inTransition = true));
+        self.lastTransitionNode = node;
+    };
 
+    const onEntering = node => {
         if (node && typeof timeout === 'number') {
-            node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
-                timeout + 'ms';
+            node.style.transitionDuration =
+                node.style.WebkitTransitionDuration =
+                node.style.MozTransitionDuration =
+                    `${timeout}ms`;
         }
     };
 
-    onEntered = node => {
-        if (this.lastTransitionNode === node) {
-            this.inTransition && this.setInTransition((this.inTransition = false));
+    const onEntered = node => {
+        if (self.lastTransitionNode === node) {
+            self.inTransition && setInTransition((self.inTransition = false));
         }
 
         if (node) {
-            const { timeout } = this.props;
-
             // remove all transition classNames
             node.className = node.className
                 .split(/\s+/)
@@ -115,72 +104,75 @@ class AnimatedRouter extends Component<AnimatedRouterProps & RouteComponentProps
                 .join(' ');
 
             if (typeof timeout === 'number') {
-                node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
-                    '';
+                node.style.transitionDuration =
+                    node.style.WebkitTransitionDuration =
+                    node.style.MozTransitionDuration =
+                        '';
             }
         }
     };
 
-    componentDidMount() {
-        this.rootNode = findDOMNode(this) as Element;
+    useEffect(() => {
+        self.rootNode = findDOMNode(rootNodeRef.current) as HTMLElement;
+    }, [self]);
+
+    if (isSSR) {
+        return <Routes>{children}</Routes>;
     }
 
-    render() {
-        if (isSSR) {
-            return <Switch>{this.props.children}</Switch>;
-        }
+    const groupProps = {
+        appear,
+        enter,
+        exit,
+        component
+    };
+    const cssProps = {
+        onExit: onEnter,
+        onExiting: onEntering,
+        onExited: onEntered,
+        onEnter,
+        onEntering,
+        onEntered
+    };
+    const cls = [`${prefix}-container`, 'react-animated-router', className];
 
-        const { className, location, children, timeout, prefix, appear, enter, exit, component } = this.props;
-        const groupProps = {
-            appear,
-            enter,
-            exit,
-            component
-        };
-        const cssProps = {
-            onExit: this.onEnter,
-            onExiting: this.onEntering,
-            onExited: this.onEntered,
-            onEnter: this.onEnter,
-            onEntering: this.onEntering,
-            onEntered: this.onEntered
-        };
-        const cls = [prefix + '-container', 'react-animated-router', className];
+    return (
+        <TransitionGroup
+            className={cls.filter(Boolean).join(' ')}
+            ref={rootNodeRef}
+            childFactory={child => {
+                const classNames = `${prefix}-${isHistoryPush(location, child.props.in) ? 'forward' : 'backward'}`;
 
-        return (
-            <TransitionGroup
-                className={cls.filter(Boolean).join(' ')}
-                childFactory={child => {
-                    const classNames =
-                        prefix + '-' + (isHistoryPush(location, child.props.in) ? 'forward' : 'backward');
-
-                    return React.cloneElement(child, {
-                        classNames
-                    });
+                return React.cloneElement(child, {
+                    classNames
+                });
+            }}
+            {...groupProps}>
+            <CSSTransition
+                key={transitionKey || location.pathname}
+                addEndListener={(node, done) => {
+                    node.addEventListener(
+                        'transitionend',
+                        function (e) {
+                            // 确保动画来自于目标节点
+                            if (e.target === node) {
+                                done();
+                            }
+                        },
+                        false
+                    );
                 }}
-                {...groupProps}>
-                <CSSTransition
-                    key={this.props.transitionKey || location.pathname}
-                    addEndListener={(node, done) => {
-                        node.addEventListener(
-                            'transitionend',
-                            function(e) {
-                                // 确保动画来自于目标节点
-                                if (e.target === node) {
-                                    done();
-                                }
-                            },
-                            false
-                        );
-                    }}
-                    unmountOnExit={true}
-                    timeout={timeout as any}
-                    {...cssProps}>
-                    <Switch location={location}>{children}</Switch>
-                </CSSTransition>
-            </TransitionGroup>
-        );
-    }
-}
+                unmountOnExit={true}
+                timeout={timeout as any}
+                {...cssProps}>
+                <Routes location={location}>{children}</Routes>
+            </CSSTransition>
+        </TransitionGroup>
+    );
+};
 
-export default withRouter(AnimatedRouter);
+AnimatedRouter.defaultProps = {
+    prefix: 'animated-router'
+};
+
+export default AnimatedRouter;

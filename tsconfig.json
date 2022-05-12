@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES5",
     "module": "ESNext",
-    "lib": ["esnext", "dom"],
+    "lib": ["ESNext", "DOM"],
     "jsx": "react",
     "resolveJsonModule": true,
     "experimentalDecorators": true,
@@ -17,11 +17,11 @@
     "importHelpers": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
+    "skipLibCheck": true,
     "noUnusedLocals": true,
-    "importHelpers": true,
     "declaration": true,
     "outDir": "dist"
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "build"]
+  "exclude": ["dist", "build"]
 }
