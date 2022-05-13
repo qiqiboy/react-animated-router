@@ -2,99 +2,79 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
 var React = require('react');
-var React__default = _interopDefault(React);
 var reactDom = require('react-dom');
+var PropTypes = require('prop-types');
 var reactTransitionGroup = require('react-transition-group');
 var reactRouter = require('react-router');
-var PropTypes = _interopDefault(require('prop-types'));
 
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
+var PropTypes__default = /*#__PURE__*/_interopDefaultLegacy(PropTypes);
+
+function unwrapExports (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
 
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-
-function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
-
-function _typeof(obj) {
-  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
-    _typeof = function _typeof(obj) {
-      return _typeof2(obj);
-    };
+var defineProperty$1 = createCommonjsModule(function (module) {
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
   } else {
-    _typeof = function _typeof(obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
-    };
+    obj[key] = value;
   }
 
-  return _typeof(obj);
+  return obj;
 }
 
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+module.exports = _defineProperty, module.exports.__esModule = true, module.exports["default"] = module.exports;
+});
+
+unwrapExports(defineProperty$1);
+
+var defineProperty = defineProperty$1;
+
+var objectSpread2 = createCommonjsModule(function (module) {
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    enumerableOnly && (symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    })), keys.push.apply(keys, symbols);
   }
 
-  return self;
+  return keys;
 }
 
-function _possibleConstructorReturn(self, call) {
-  if (call && (_typeof(call) === "object" || typeof call === "function")) {
-    return call;
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = null != arguments[i] ? arguments[i] : {};
+    i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+      defineProperty(target, key, source[key]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+    });
   }
 
-  return _assertThisInitialized(self);
+  return target;
 }
 
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
+module.exports = _objectSpread2, module.exports.__esModule = true, module.exports["default"] = module.exports;
+});
 
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
+var _objectSpread = unwrapExports(objectSpread2);
 
 var isSSR = typeof window === 'undefined';
 var lastLocation = {
@@ -138,150 +118,157 @@ var isHistoryPush = function isHistoryPush(location, update) {
  *  import AnimatedRouter from 'react-animated-router';
  *  import 'react-animated-router/animate.css';
  */
-var AnimatedRouter =
-/*#__PURE__*/
-function (_Component) {
-  _inherits(AnimatedRouter, _Component);
+var AnimatedRouter = function AnimatedRouter(props) {
+  var baseLocation = reactRouter.useLocation();
+  var rootRef = React.useRef(null);
+  var className = props.className,
+      children = props.children,
+      timeout = props.timeout,
+      prefix = props.prefix,
+      appear = props.appear,
+      enter = props.enter,
+      exit = props.exit,
+      transitionKey = props.transitionKey,
+      component = props.component,
+      _parentPath = props._parentPath,
+      _props$location = props.location,
+      location = _props$location === void 0 ? baseLocation : _props$location;
+  var self = React.useRef({
+    inTransition: false,
+    inAppearTransition: !!appear
+  }).current;
+  var childrenRoutes = React.useMemo(function () {
+    return !Array.isArray(children) || React.isValidElement(children[0]) ? reactRouter.createRoutesFromChildren(children) : children;
+  }, [children]) || [];
 
-  function AnimatedRouter() {
-    var _getPrototypeOf2;
-
-    var _this;
-
-    _classCallCheck(this, AnimatedRouter);
-
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(AnimatedRouter)).call.apply(_getPrototypeOf2, [this].concat(args)));
-    _this.inTransition = false;
-    _this.rootNode = void 0;
-    _this.lastTransitionNode = void 0;
-
-    _this.onEnter = function (node) {
-      _this.inTransition || _this.setInTransition(_this.inTransition = true);
-      _this.lastTransitionNode = node;
-    };
-
-    _this.onEntering = function (node) {
-      var timeout = _this.props.timeout;
-
-      if (node && typeof timeout === 'number') {
-        node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = timeout + 'ms';
-      }
-    };
-
-    _this.onEntered = function (node) {
-      if (_this.lastTransitionNode === node) {
-        _this.inTransition && _this.setInTransition(_this.inTransition = false);
-      }
-
-      if (node) {
-        var timeout = _this.props.timeout; // remove all transition classNames
-
-        node.className = node.className.split(/\s+/).filter(function (name) {
-          return !/-(?:forward|backward)-(?:enter|exit)(?:-active)?$/.test(name);
-        }).join(' ');
-
-        if (typeof timeout === 'number') {
-          node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = '';
-        }
-      }
-    };
-
-    return _this;
+  if (!transitionKey && childrenRoutes.length) {
+    var routes = reactRouter.matchRoutes(childrenRoutes.map(function (route) {
+      return _objectSpread(_objectSpread({}, route), {}, {
+        path: reactRouter.createPath(reactRouter.resolvePath(route.path || '', _parentPath))
+      });
+    }), location);
+    transitionKey = routes === null || routes === void 0 ? void 0 : routes[0].pathname;
   }
 
-  _createClass(AnimatedRouter, [{
-    key: "setInTransition",
-    value: function setInTransition(isAdd) {
-      if (this.rootNode) {
-        var inName = this.props.prefix + '-in-transition';
-        this.rootNode.className = this.rootNode.className.split(/\s+/).filter(function (name) {
-          return name !== inName;
-        }).concat(isAdd ? inName : []).join(' ');
-      }
-    }
-  }, {
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      this.rootNode = reactDom.findDOMNode(this);
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      if (isSSR) {
-        return React__default.createElement(reactRouter.Switch, null, this.props.children);
+  var animatedRoute = function animatedRoute(routes) {
+    return routes.map(function (route) {
+      var _route$children;
+
+      if ((_route$children = route.children) !== null && _route$children !== void 0 && _route$children.length) {
+        var animatedElement = /*#__PURE__*/React__default["default"].createElement(AnimatedRouter, Object.assign({}, props, {
+          children: route.children,
+          location: location,
+          _parentPath: reactRouter.createPath(reactRouter.resolvePath(route.path || '', _parentPath))
+        }));
+        return _objectSpread(_objectSpread({}, route), {}, {
+          children: [{
+            element: animatedElement,
+            children: route.children
+          }]
+        });
       }
 
-      var _this$props = this.props,
-          className = _this$props.className,
-          location = _this$props.location,
-          children = _this$props.children,
-          timeout = _this$props.timeout,
-          prefix = _this$props.prefix,
-          appear = _this$props.appear,
-          enter = _this$props.enter,
-          exit = _this$props.exit,
-          component = _this$props.component;
-      var groupProps = {
-        appear: appear,
-        enter: enter,
-        exit: exit,
-        component: component
-      };
-      var cssProps = {
-        onExit: this.onEnter,
-        onExiting: this.onEntering,
-        onExited: this.onEntered,
-        onEnter: this.onEnter,
-        onEntering: this.onEntering,
-        onEntered: this.onEntered
-      };
-      var cls = [prefix + '-container', 'react-animated-router', className];
-      return React__default.createElement(reactTransitionGroup.TransitionGroup, Object.assign({
-        className: cls.filter(Boolean).join(' '),
-        childFactory: function childFactory(child) {
-          var classNames = prefix + '-' + (isHistoryPush(location, child.props.in) ? 'forward' : 'backward');
-          return React__default.cloneElement(child, {
-            classNames: classNames
-          });
+      return route;
+    });
+  };
+
+  var childElement = reactRouter.useRoutes(animatedRoute(childrenRoutes), location);
+  var setInTransition = React.useCallback(function (isAdd) {
+    if (self.rootNode) {
+      var inName = "".concat(prefix, "-in-transition");
+      self.rootNode.className = self.rootNode.className.split(/\s+/).filter(function (name) {
+        return name !== inName;
+      }).concat(isAdd ? inName : []).join(' ');
+    }
+  }, [prefix, self]);
+  var onEnter = React.useCallback(function (node) {
+    self.inTransition || setInTransition(self.inTransition = true);
+    self.lastTransitionNode = node;
+  }, [self, setInTransition]);
+  var onEntering = React.useCallback(function (node) {
+    if (node && typeof timeout === 'number') {
+      node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = "".concat(timeout, "ms");
+    }
+  }, [timeout]);
+  var onEntered = React.useCallback(function (node) {
+    if (self.lastTransitionNode === node) {
+      self.inTransition && setInTransition(self.inTransition = false);
+    }
+
+    if (self.inAppearTransition) {
+      self.inAppearTransition = false;
+    }
+
+    if (node) {
+      // remove all transition classNames
+      node.className = node.className.split(/\s+/).filter(function (name) {
+        return !/-(?:forward|backward)-(?:enter|exit)(?:-active)?$/.test(name);
+      }).join(' ');
+
+      if (typeof timeout === 'number') {
+        node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = '';
+      }
+    }
+  }, [self, setInTransition, timeout]);
+  var groupProps = {
+    appear: appear,
+    enter: enter,
+    exit: exit,
+    component: component
+  };
+  var cssProps = {
+    onExit: onEnter,
+    onExiting: onEntering,
+    onExited: onEntered,
+    onEnter: onEnter,
+    onEntering: onEntering,
+    onEntered: onEntered
+  };
+  var cls = ["".concat(prefix, "-container"), 'react-animated-router', className];
+  React.useEffect(function () {
+    self.rootNode = reactDom.findDOMNode(rootRef.current);
+  }, [self]);
+
+  if (isSSR || !childElement) {
+    return childElement;
+  }
+
+  return /*#__PURE__*/React__default["default"].createElement(reactTransitionGroup.TransitionGroup, Object.assign({
+    ref: rootRef,
+    className: cls.filter(Boolean).join(' '),
+    childFactory: function childFactory(child) {
+      var classNames = "".concat(prefix, "-").concat(isHistoryPush(location, self.inAppearTransition ? false : child.props.in) ? 'forward' : 'backward');
+      return React__default["default"].cloneElement(child, {
+        classNames: classNames
+      });
+    }
+  }, groupProps), /*#__PURE__*/React__default["default"].createElement(reactTransitionGroup.CSSTransition, Object.assign({
+    key: transitionKey || location.pathname,
+    addEndListener: function addEndListener(node, done) {
+      node.addEventListener('transitionend', function (e) {
+        // 确保动画来自于目标节点
+        if (e.target === node) {
+          done();
         }
-      }, groupProps), React__default.createElement(reactTransitionGroup.CSSTransition, Object.assign({
-        key: this.props.transitionKey || location.pathname,
-        addEndListener: function addEndListener(node, done) {
-          node.addEventListener('transitionend', function (e) {
-            // 确保动画来自于目标节点
-            if (e.target === node) {
-              done();
-            }
-          }, false);
-        },
-        unmountOnExit: true,
-        timeout: timeout
-      }, cssProps), React__default.createElement(reactRouter.Switch, {
-        location: location
-      }, children)));
-    }
-  }]);
-
-  return AnimatedRouter;
-}(React.Component);
+      }, false);
+    },
+    unmountOnExit: true,
+    timeout: timeout
+  }, cssProps), childElement));
+};
 
 AnimatedRouter.propTypes = {
-  className: PropTypes.string,
-  transitionKey: PropTypes.any,
-  timeout: PropTypes.number,
-  prefix: PropTypes.string,
-  appear: PropTypes.bool,
-  enter: PropTypes.bool,
-  exit: PropTypes.bool,
-  component: PropTypes.any
+  className: PropTypes__default["default"].string,
+  transitionKey: PropTypes__default["default"].oneOfType([PropTypes__default["default"].string, PropTypes__default["default"].number]),
+  timeout: PropTypes__default["default"].number,
+  prefix: PropTypes__default["default"].string,
+  appear: PropTypes__default["default"].bool,
+  enter: PropTypes__default["default"].bool,
+  exit: PropTypes__default["default"].bool,
+  component: PropTypes__default["default"].any
 };
 AnimatedRouter.defaultProps = {
   prefix: 'animated-router'
 };
-var AnimatedRouter$1 = reactRouter.withRouter(AnimatedRouter);
 
-exports.default = AnimatedRouter$1;
+exports["default"] = AnimatedRouter;

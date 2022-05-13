@@ -13,6 +13,12 @@ $prefix: animated-router !default;
     }
 
     /** START: 自定义进出场动画 **/
+    &-forward-appear {
+        opacity: 0;
+    }
+    &-forward-appear-active {
+        opacity: 1;
+    }
     &-forward-enter {
         transform: translate(100%);
     }
@@ -26,6 +32,12 @@ $prefix: animated-router !default;
         transform: translate(-100%);
     }
 
+    &-backward-appear {
+        opacity: 1;
+    }
+    &-backward-appear-active {
+        opacity: 0;
+    }
     &-backward-enter {
         transform: translate(-100%);
     }
@@ -40,6 +52,10 @@ $prefix: animated-router !default;
     }
     /** END **/
 
+    &-forward-appear-active,
+    &-backward-appear-active {
+        transition: opacity 0.3s linear;
+    }
     &-forward-enter-active,
     &-forward-exit-active,
     &-backward-enter-active,

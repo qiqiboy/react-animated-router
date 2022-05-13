@@ -1,14 +1,14 @@
 {
   "name": "react-animated-router",
-  "version": "0.2.4",
+  "version": "1.0.0",
   "description": "Dynamic transitions with react-router and react-transition-group",
   "author": "qiqiboy",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/AnimatedRouter.d.ts",
   "engines": {
-    "node": ">=8.0.0",
-    "tiger-new": "4.1.9"
+    "node": ">=10.13.0",
+    "tiger-new": "7.3.1"
   },
   "entryFile": "src/AnimatedRouter.tsx",
   "exportName": "react-animated-router",
@@ -20,11 +20,9 @@
     "src/"
   ],
   "scripts": {
-    "build": "npm run lint && npm run clear && npm run build:declaration && npm run build:bundle",
-    "build:bundle": "rollup -c",
-    "build:declaration": "tsc --emitDeclarationOnly",
-    "clear": "rimraf dist",
-    "lint": "node_modules/.bin/eslint 'src/**/*.{js,jsx,ts,tsx}'"
+    "build": "rimraf dist && tsc --emitDeclarationOnly && rollup -c",
+    "test": "node jest/test.js",
+    "tsc": "node -e \"require('fs-extra').outputJsonSync('.git-tsconfig.json',{ extends: './tsconfig.json', include: ['*.d.ts'].concat(process.env.StagedFiles.split(/\\n+/)) })\" && echo 'TS checking...\\n' && tsc -p .git-tsconfig.json --noEmit --checkJs false"
   },
   "browserslist": [
     ">0.2%",
@@ -39,7 +37,9 @@
   },
   "eslintConfig": {
     "extends": [
-      "react-app"
+      "react-app",
+      "react-app/jest",
+      "./eslint.config.js"
     ]
   },
   "commitlint": {
@@ -64,7 +64,6 @@
     "printWidth": 120,
     "tabWidth": 4,
     "trailingComma": "none",
-    "jsxBracketSameLine": true,
     "semi": true,
     "singleQuote": true,
     "overrides": [
@@ -74,17 +73,17 @@
           "tabWidth": 2
         }
       }
-    ]
+    ],
+    "arrowParens": "avoid",
+    "bracketSameLine": true
   },
   "lint-staged": {
     "src/**/*.{js,jsx,mjs,ts,tsx}": [
       "node_modules/.bin/prettier --write",
-      "node_modules/.bin/eslint --fix",
-      "git add"
+      "node_modules/.bin/eslint --fix"
     ],
     "src/**/*.{css,scss,less,json,html,md}": [
-      "node_modules/.bin/prettier --write",
-      "git add"
+      "node_modules/.bin/prettier --write"
     ]
   },
   "stylelint": {
@@ -92,11 +91,11 @@
   },
   "peerDependencies": {
     "@babel/runtime": ">7.0.0",
-    "react": ">16.0.0",
-    "react-dom": ">16.0.0",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
     "prop-types": ">15.5.0",
-    "react-transition-group": ">2.0.0",
-    "react-router": ">4.0.0"
+    "react-transition-group": ">=2.0.0",
+    "react-router": ">=6.0.0"
   },
   "repository": {
     "type": "git",
@@ -106,49 +105,65 @@
   "bugs": {
     "url": "https://github.com/qiqiboy/react-animated-router/issues"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@babel/cli": "7.6.2",
-    "@babel/core": "7.6.2",
-    "@commitlint/cli": "8.2.0",
-    "@commitlint/config-conventional": "8.2.0",
-    "@types/node": "11.13.21",
+    "@babel/cli": "7.17.10",
+    "@babel/core": "7.17.10",
+    "@commitlint/cli": "11.0.0",
+    "@commitlint/config-conventional": "11.0.0",
+    "@rollup/plugin-babel": "5.3.1",
+    "@rollup/plugin-commonjs": "11.1.0",
+    "@rollup/plugin-eslint": "8.0.2",
+    "@rollup/plugin-json": "4.1.0",
+    "@rollup/plugin-node-resolve": "10.0.0",
+    "@rollup/plugin-replace": "2.4.2",
+    "@testing-library/jest-dom": "5.16.4",
+    "@testing-library/react": "11.2.7",
+    "@testing-library/user-event": "12.8.3",
+    "@types/jest": "26.0.24",
+    "@types/node": "14.18.18",
     "@types/prop-types": "^15.7.3",
-    "@types/react": "^16.9.3",
-    "@types/react-dom": "^16.9.1",
-    "@types/react-is": "16.7.1",
-    "@types/react-router-dom": "^5.1.0",
+    "@types/react": "17.0.45",
+    "@types/react-dom": "17.0.17",
+    "@types/react-is": "17.0.3",
     "@types/react-transition-group": "^4.2.2",
-    "@typescript-eslint/eslint-plugin": "2.3.1",
-    "@typescript-eslint/parser": "2.3.1",
-    "babel-eslint": "10.0.3",
-    "babel-preset-react-app": "9.0.2",
-    "eslint": "6.5.0",
-    "eslint-config-react-app": "5.0.2",
-    "eslint-plugin-flowtype": "4.3.0",
-    "eslint-plugin-import": "2.18.2",
-    "eslint-plugin-jsx-a11y": "6.2.3",
-    "eslint-plugin-react": "7.14.3",
-    "eslint-plugin-react-hooks": "2.1.1",
-    "husky": "2.7.0",
-    "lint-staged": "8.2.1",
-    "prettier": "1.18.2",
-    "prop-types": "^15.7.2",
-    "react": "^16.10.1",
-    "react-dom": "^16.10.1",
-    "react-router-dom": "^5.1.1",
+    "@typescript-eslint/eslint-plugin": "4.33.0",
+    "@typescript-eslint/parser": "4.33.0",
+    "babel-eslint": "10.1.0",
+    "babel-jest": "26.6.3",
+    "babel-preset-react-app": "10.0.1",
+    "eslint": "7.32.0",
+    "eslint-config-react-app": "6.0.0",
+    "eslint-plugin-flowtype": "5.10.0",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-jest": "24.7.0",
+    "eslint-plugin-jsx-a11y": "6.5.1",
+    "eslint-plugin-react": "7.29.4",
+    "eslint-plugin-react-hooks": "4.5.0",
+    "eslint-plugin-testing-library": "3.10.2",
+    "husky": "3.1.0",
+    "jest": "26.6.3",
+    "jest-environment-jsdom-fourteen": "1.0.1",
+    "jest-resolve": "26.6.2",
+    "jest-runner-eslint": "0.11.1",
+    "jest-watch-typeahead": "0.4.2",
+    "lint-staged": "10.5.4",
+    "prettier": "2.6.2",
+    "prop-types": "15.8.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-router": "^6.3.0",
     "react-transition-group": "^4.3.0",
-    "rimraf": "2.6.3",
-    "rollup": "1.22.0",
+    "rimraf": "3.0.2",
+    "rollup": "2.72.1",
     "rollup-plugin-babel": "4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
-    "rollup-plugin-copy": "1.1.0",
-    "rollup-plugin-filesize": "6.2.0",
+    "rollup-plugin-copy": "3.4.0",
+    "rollup-plugin-filesize": "9.1.2",
     "rollup-plugin-node-resolve": "5.2.0",
     "rollup-plugin-replace": "2.2.0",
-    "rollup-plugin-sass": "1.2.2",
+    "rollup-plugin-sass": "1.2.12",
     "rollup-plugin-sourcemaps": "0.4.2",
-    "rollup-plugin-terser": "4.0.4",
-    "typescript": "3.6.3"
+    "rollup-plugin-terser": "7.0.2",
+    "typescript": "^4.4.4"
   }
 }
