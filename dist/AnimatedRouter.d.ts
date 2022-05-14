@@ -1,16 +1,7 @@
-import React, { ReactType } from 'react';
-import { Location, RouteObject } from 'react-router';
-import { TransitionActions } from 'react-transition-group/Transition';
+import React from 'react';
+import { AnimatedRouterProps } from './useAnimatedRoutes';
 import './animate.scss';
-interface AnimatedRouterProps extends TransitionActions {
-    className?: string;
-    transitionKey?: string | number;
-    timeout?: number;
-    prefix?: string;
-    component?: ReactType | null;
-    location?: Location;
-    children: React.ReactNode | RouteObject[];
-}
+export * from './useAnimatedRoutes';
 /**
  * @desc 路由动画组件
  * @author qiqiboy
@@ -20,6 +11,6 @@ interface AnimatedRouterProps extends TransitionActions {
  *  import 'react-animated-router/animate.css';
  */
 declare const AnimatedRouter: React.FC<AnimatedRouterProps & {
-    _parentPath?: string;
+    children: React.ReactNode;
 }>;
 export default AnimatedRouter;

@@ -1,8 +1,42 @@
-import React, { useRef, useMemo, isValidElement, useCallback, useEffect } from 'react';
-import { findDOMNode } from 'react-dom';
 import PropTypes from 'prop-types';
+import { useLocation, parsePath, matchRoutes, useRoutes, createRoutesFromChildren } from 'react-router';
+import React, { useRef, useMemo, useCallback, useEffect } from 'react';
+import { findDOMNode } from 'react-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { useLocation, createRoutesFromChildren, matchRoutes, createPath, resolvePath, useRoutes } from 'react-router';
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+function _objectWithoutProperties(source, excluded) {
+  if (source == null) return {};
+  var target = _objectWithoutPropertiesLoose(source, excluded);
+  var key, i;
+
+  if (Object.getOwnPropertySymbols) {
+    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+    for (i = 0; i < sourceSymbolKeys.length; i++) {
+      key = sourceSymbolKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+      target[key] = source[key];
+    }
+  }
+
+  return target;
+}
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -45,6 +79,7 @@ function _objectSpread2(target) {
   return target;
 }
 
+var _excluded$1 = ["parentMatches", "routes"];
 var isSSR = typeof window === 'undefined';
 var lastLocation = {
   key: '',
@@ -79,69 +114,78 @@ var isHistoryPush = function isHistoryPush(location, update) {
   return lastLocation.isPush;
 };
 
+var InternalAnimatedRoutes = function InternalAnimatedRoutes(_ref) {
+  var parentMatches = _ref.parentMatches,
+      routes = _ref.routes,
+      props = _objectWithoutProperties(_ref, _excluded$1);
+
+  return useAnimatedRoutes(routes, props, parentMatches);
+};
 /**
- * @desc 路由动画组件
- * @author qiqiboy
+ * 类似于useRoutes，使用useAnimatedRoutes则可以给该组路由增加切换动画
  *
- *  需要动画样式文件配合，所以如果使用默认的动画效果，则需要一并将项目中的animated.css导入项目
- *  import AnimatedRouter from 'react-animated-router';
- *  import 'react-animated-router/animate.css';
+ * @param routes 路由配置数组
+ * @param props 设置项
+ * @param parentMatches 内部参数，请勿传递
  */
-var AnimatedRouter = function AnimatedRouter(props) {
+
+
+function useAnimatedRoutes(routes, props, parentMatches) {
   var baseLocation = useLocation();
   var rootRef = useRef(null);
-  var className = props.className,
-      children = props.children,
-      timeout = props.timeout,
-      prefix = props.prefix,
-      appear = props.appear,
-      enter = props.enter,
-      exit = props.exit,
-      transitionKey = props.transitionKey,
-      component = props.component,
-      _parentPath = props._parentPath,
-      _props$location = props.location,
-      location = _props$location === void 0 ? baseLocation : _props$location;
+
+  var _ref2 = props || {},
+      className = _ref2.className,
+      timeout = _ref2.timeout,
+      _ref2$prefix = _ref2.prefix,
+      prefix = _ref2$prefix === void 0 ? 'animated-router' : _ref2$prefix,
+      appear = _ref2.appear,
+      enter = _ref2.enter,
+      exit = _ref2.exit,
+      transitionKey = _ref2.transitionKey,
+      component = _ref2.component,
+      _ref2$location = _ref2.location,
+      location = _ref2$location === void 0 ? baseLocation : _ref2$location;
+
   var self = useRef({
     inTransition: false,
     inAppearTransition: !!appear
   }).current;
-  var childrenRoutes = useMemo(function () {
-    return !Array.isArray(children) || isValidElement(children[0]) ? createRoutesFromChildren(children) : children;
-  }, [children]) || [];
 
-  if (!transitionKey && childrenRoutes.length) {
-    var routes = matchRoutes(childrenRoutes.map(function (route) {
-      return _objectSpread2(_objectSpread2({}, route), {}, {
-        path: createPath(resolvePath(route.path || '', _parentPath))
-      });
-    }), location);
-    transitionKey = routes === null || routes === void 0 ? void 0 : routes[0].pathname;
+  if (typeof location === 'string') {
+    location = parsePath(location);
   }
 
-  var animatedRoute = function animatedRoute(routes) {
-    return routes.map(function (route) {
-      var _route$children;
+  var routeMatches = useMemo(function () {
+    return parentMatches || matchRoutes(routes, location);
+  }, [location, routes, parentMatches]) || [];
+  var routeIndex = routeMatches.findIndex(function (match) {
+    return routes.includes(match.route);
+  });
 
-      if ((_route$children = route.children) !== null && _route$children !== void 0 && _route$children.length) {
-        var animatedElement = /*#__PURE__*/React.createElement(AnimatedRouter, Object.assign({}, props, {
-          children: route.children,
-          location: location,
-          _parentPath: createPath(resolvePath(route.path || '', _parentPath))
-        }));
-        return _objectSpread2(_objectSpread2({}, route), {}, {
-          children: [{
-            element: animatedElement,
-            children: route.children
-          }]
-        });
-      }
+  if (!transitionKey && routeIndex > -1) {
+    transitionKey = routeMatches[routeIndex].pathname;
+  }
 
-      return route;
-    });
-  };
+  var children = useRoutes(routes.map(function (route) {
+    var _route$children;
 
-  var childElement = useRoutes(animatedRoute(childrenRoutes), location);
+    if ((_route$children = route.children) !== null && _route$children !== void 0 && _route$children.length) {
+      var animatedElement = /*#__PURE__*/React.createElement(InternalAnimatedRoutes, Object.assign({}, props, {
+        routes: route.children,
+        location: location,
+        parentMatches: routeMatches
+      }));
+      return _objectSpread2(_objectSpread2({}, route), {}, {
+        children: [{
+          element: animatedElement,
+          children: route.children
+        }]
+      });
+    }
+
+    return route;
+  }), location);
   var setInTransition = useCallback(function (isAdd) {
     if (self.rootNode) {
       var inName = "".concat(prefix, "-in-transition");
@@ -198,8 +242,8 @@ var AnimatedRouter = function AnimatedRouter(props) {
     self.rootNode = findDOMNode(rootRef.current);
   }, [self]);
 
-  if (isSSR || !childElement) {
-    return childElement;
+  if (isSSR || !children) {
+    return children;
   }
 
   return /*#__PURE__*/React.createElement(TransitionGroup, Object.assign({
@@ -223,7 +267,25 @@ var AnimatedRouter = function AnimatedRouter(props) {
     },
     unmountOnExit: true,
     timeout: timeout
-  }, cssProps), childElement));
+  }, cssProps), children));
+}
+
+var _excluded = ["children"];
+/**
+ * @desc 路由动画组件
+ * @author qiqiboy
+ *
+ *  需要动画样式文件配合，所以如果使用默认的动画效果，则需要一并将项目中的animated.css导入项目
+ *  import AnimatedRouter from 'react-animated-router';
+ *  import 'react-animated-router/animate.css';
+ */
+
+var AnimatedRouter = function AnimatedRouter(_ref) {
+  var children = _ref.children,
+      props = _objectWithoutProperties(_ref, _excluded);
+
+  var routes = createRoutesFromChildren(children);
+  return useAnimatedRoutes(routes, props);
 };
 
 AnimatedRouter.propTypes = {
@@ -234,10 +296,11 @@ AnimatedRouter.propTypes = {
   appear: PropTypes.bool,
   enter: PropTypes.bool,
   exit: PropTypes.bool,
-  component: PropTypes.any
+  component: PropTypes.any,
+  children: PropTypes.node
 };
 AnimatedRouter.defaultProps = {
   prefix: 'animated-router'
 };
 
-export { AnimatedRouter as default };
+export { AnimatedRouter as default, useAnimatedRoutes };
