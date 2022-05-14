@@ -12,16 +12,10 @@
   width: 100%;
   overflow: hidden;
 }
-.animated-router-forward-appear {
-  opacity: 0;
-}
-.animated-router-forward-appear-active {
-  opacity: 1;
-}
-.animated-router-forward-enter {
+.animated-router-forward-appear, .animated-router-forward-enter {
   transform: translate(100%);
 }
-.animated-router-forward-enter-active {
+.animated-router-forward-appear-active, .animated-router-forward-enter-active {
   transform: translate(0);
 }
 .animated-router-forward-exit {
@@ -30,16 +24,10 @@
 .animated-router-forward-exit-active {
   transform: translate(-100%);
 }
-.animated-router-backward-appear {
-  opacity: 1;
-}
-.animated-router-backward-appear-active {
-  opacity: 0;
-}
-.animated-router-backward-enter {
+.animated-router-backward-appear, .animated-router-backward-enter {
   transform: translate(-100%);
 }
-.animated-router-backward-enter-active {
+.animated-router-backward-appear-active, .animated-router-backward-enter-active {
   transform: translate(0);
 }
 .animated-router-backward-exit {
@@ -48,10 +36,7 @@
 .animated-router-backward-exit-active {
   transform: translate(100%);
 }
-.animated-router-forward-appear-active, .animated-router-backward-appear-active {
-  transition: opacity 0.3s linear;
-}
-.animated-router-forward-enter-active, .animated-router-forward-exit-active, .animated-router-backward-enter-active, .animated-router-backward-exit-active {
+.animated-router-forward-appear-active, .animated-router-backward-appear-active, .animated-router-forward-enter-active, .animated-router-forward-exit-active, .animated-router-backward-enter-active, .animated-router-backward-exit-active {
   /* 不同过渡阶段需要的过渡时间与缓动效果 */
   transition: transform 0.3s linear;
 }

@@ -18,17 +18,18 @@ const isHistoryPush = (location, update) => {
 
     if (update && key !== lastLocation.key) {
         const index = histories.lastIndexOf(key);
+        const isPush = index < 0 || index + 1 === histories.length;
 
-        if (index > -1) {
-            histories.splice(index + 1);
-        } else {
+        if (isPush) {
             histories.push(key);
+        } else {
+            histories.splice(index + 1);
         }
 
         sessionStorage.setItem(REACT_HISTORIES_KEY, histories.join(','));
 
         lastLocation = {
-            isPush: index < 0,
+            isPush,
             key
         };
     }
@@ -51,6 +52,7 @@ const InternalAnimatedRoutes: React.FC<
         routes: RouteObject[];
     }
 > = ({ parentMatches, routes, ...props }) => {
+    // @ts-ignore
     return useAnimatedRoutes(routes, props, parentMatches);
 };
 
@@ -59,15 +61,11 @@ const InternalAnimatedRoutes: React.FC<
  *
  * @param routes 路由配置数组
  * @param props 设置项
- * @param parentMatches 内部参数，请勿传递
  */
-export function useAnimatedRoutes(
-    routes: RouteObject[],
-    props?: AnimatedRouterProps,
-    parentMatches?: RouteMatch[] | null
-) {
+export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterProps): React.ReactElement | null {
     const baseLocation = useLocation();
     const rootRef = useRef<TransitionGroup>(null);
+    const parentMatches: RouteMatch[] | undefined = arguments[2];
 
     let {
         className,
@@ -82,19 +80,17 @@ export function useAnimatedRoutes(
     } = props || {};
     const self = useRef<{
         inTransition: boolean;
-        inAppearTransition: boolean;
         rootNode?: Element;
         lastTransitionNode?: Element;
     }>({
-        inTransition: false,
-        inAppearTransition: !!appear
+        inTransition: false
     }).current;
 
     if (typeof location === 'string') {
         location = parsePath(location);
     }
 
-    const routeMatches =
+    const routeMatches: RouteMatch[] =
         useMemo(() => parentMatches || matchRoutes(routes, location), [location, routes, parentMatches]) || [];
     const routeIndex = routeMatches.findIndex(match => routes.includes(match.route));
 
@@ -171,15 +167,11 @@ export function useAnimatedRoutes(
                 self.inTransition && setInTransition((self.inTransition = false));
             }
 
-            if (self.inAppearTransition) {
-                self.inAppearTransition = false;
-            }
-
             if (node) {
                 // remove all transition classNames
                 node.className = node.className
                     .split(/\s+/)
-                    .filter(name => !/-(?:forward|backward)-(?:enter|exit)(?:-active)?$/.test(name))
+                    .filter(name => !/-(?:forward|backward)-(?:enter|exit|appear)(?:-active|-done)?$/.test(name))
                     .join(' ');
 
                 if (typeof timeout === 'number') {
@@ -222,9 +214,7 @@ export function useAnimatedRoutes(
             ref={rootRef}
             className={cls.filter(Boolean).join(' ')}
             childFactory={child => {
-                const classNames = `${prefix}-${
-                    isHistoryPush(location, self.inAppearTransition ? false : child.props.in) ? 'forward' : 'backward'
-                }`;
+                const classNames = `${prefix}-${isHistoryPush(location, child.props.in) ? 'forward' : 'backward'}`;
 
                 return React.cloneElement(child, {
                     classNames
