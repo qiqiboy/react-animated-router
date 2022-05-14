@@ -164,7 +164,7 @@ function useAnimatedRoutes(routes, props, parentMatches) {
   });
 
   if (!transitionKey && routeIndex > -1) {
-    transitionKey = routeMatches[routeIndex].pathname;
+    transitionKey = "".concat(routes.indexOf(routeMatches[routeIndex].route), "_").concat(routeMatches[routeIndex].pathname);
   }
 
   var children = useRoutes(routes.map(function (route) {

@@ -99,7 +99,7 @@ export function useAnimatedRoutes(
     const routeIndex = routeMatches.findIndex(match => routes.includes(match.route));
 
     if (!transitionKey && routeIndex > -1) {
-        transitionKey = routeMatches[routeIndex].pathname;
+        transitionKey = `${routes.indexOf(routeMatches[routeIndex].route)}_${routeMatches[routeIndex].pathname}`;
     }
 
     const children = useRoutes(
