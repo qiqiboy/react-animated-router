@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { findDOMNode } from 'react-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { Location, RouteMatch, RouteObject, useLocation, matchRoutes, useRoutes, parsePath } from 'react-router';
+import { Location, RouteMatch, RouteObject, useLocation, useRoutes, matchRoutes, parsePath } from 'react-router';
 import { TransitionActions } from 'react-transition-group/Transition';
+import { ParentMatchesContext } from './context';
 
 const isSSR = typeof window === 'undefined';
 
@@ -48,12 +49,11 @@ export interface AnimatedRouterProps extends TransitionActions {
 
 const InternalAnimatedRoutes: React.FC<
     AnimatedRouterProps & {
-        parentMatches: RouteMatch[] | null;
         routes: RouteObject[];
     }
-> = ({ parentMatches, routes, ...props }) => {
+> = ({ routes, ...props }) => {
     // @ts-ignore
-    return useAnimatedRoutes(routes, props, parentMatches);
+    return useAnimatedRoutes(routes, props, true);
 };
 
 /**
@@ -63,9 +63,10 @@ const InternalAnimatedRoutes: React.FC<
  * @param props 设置项
  */
 export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterProps): React.ReactElement | null {
+    const __INTERNAL__ = arguments[2];
     const baseLocation = useLocation();
     const rootRef = useRef<TransitionGroup>(null);
-    const parentMatches: RouteMatch[] | undefined = arguments[2];
+    let { parentMatches, parentBase, location: parentLocation } = useContext(ParentMatchesContext);
 
     let {
         className,
@@ -76,7 +77,7 @@ export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterP
         exit,
         transitionKey,
         component,
-        location = baseLocation
+        location = parentLocation || baseLocation
     } = props || {};
     const self = useRef<{
         inTransition: boolean;
@@ -91,39 +92,56 @@ export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterP
     }
 
     const routeMatches: RouteMatch[] =
-        useMemo(() => parentMatches || matchRoutes(routes, location), [location, routes, parentMatches]) || [];
+        useMemo(() => {
+            if (__INTERNAL__) {
+                return parentMatches;
+            }
+
+            // eslint-disable-next-line
+            parentBase = [parentMatches?.[parentMatches.length - 1]?.pathnameBase, parentBase]
+                .filter(Boolean)
+                .join('/')
+                .replace(/\/\/+/g, '/');
+
+            return matchRoutes(routes, location, parentBase);
+        }, [location, routes, parentMatches, __INTERNAL__]) || [];
+
     const routeIndex = routeMatches.findIndex(match => routes.includes(match.route));
 
     if (!transitionKey && routeIndex > -1) {
-        transitionKey = `${routes.indexOf(routeMatches[routeIndex].route)}_${routeMatches[routeIndex].pathname}`;
+        transitionKey = `${routes.indexOf(routeMatches[routeIndex].route)}_${routeMatches[routeIndex].pathnameBase}`;
     }
 
-    const children = useRoutes(
-        routes.map(route => {
-            if (route.children?.length) {
-                const animatedElement = (
-                    <InternalAnimatedRoutes
-                        {...props}
-                        routes={route.children}
-                        location={location}
-                        parentMatches={routeMatches}
-                    />
-                );
+    const children = (
+        <ParentMatchesContext.Provider
+            value={{
+                parentMatches: routeMatches,
+                parentBase,
+                location
+            }}>
+            {useRoutes(
+                routes.map(route => {
+                    if (route.children?.length) {
+                        const animatedElement = (
+                            <InternalAnimatedRoutes {...props} routes={route.children} location={location} />
+                        );
 
-                return {
-                    ...route,
-                    children: [
-                        {
-                            element: animatedElement,
-                            children: route.children
-                        }
-                    ]
-                };
-            }
+                        return {
+                            ...route,
+                            children: [
+                                {
+                                    element: animatedElement,
+                                    children: route.children
+                                }
+                            ]
+                        };
+                    }
 
-            return route;
-        }),
-        location
+                    return route;
+                }),
+                location
+            )}
+        </ParentMatchesContext.Provider>
     );
 
     const setInTransition = useCallback(
@@ -205,7 +223,7 @@ export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterP
         self.rootNode = findDOMNode(rootRef.current) as Element;
     }, [self]);
 
-    if (isSSR || !children) {
+    if (isSSR) {
         return children;
     }
 

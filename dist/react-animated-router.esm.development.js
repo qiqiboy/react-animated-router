@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useLocation, parsePath, matchRoutes, useRoutes, createRoutesFromChildren } from 'react-router';
-import React, { useRef, useMemo, useCallback, useEffect } from 'react';
+import React, { createContext, useRef, useContext, useMemo, useCallback, useEffect } from 'react';
 import { findDOMNode } from 'react-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
@@ -79,7 +79,12 @@ function _objectSpread2(target) {
   return target;
 }
 
-var _excluded$1 = ["parentMatches", "routes"];
+var ParentMatchesContext = createContext({
+  parentMatches: null,
+  parentBase: ''
+});
+
+var _excluded$1 = ["routes"];
 var isSSR = typeof window === 'undefined';
 var lastLocation = {
   key: '',
@@ -116,12 +121,11 @@ var isHistoryPush = function isHistoryPush(location, update) {
 };
 
 var InternalAnimatedRoutes = function InternalAnimatedRoutes(_ref) {
-  var parentMatches = _ref.parentMatches,
-      routes = _ref.routes,
+  var routes = _ref.routes,
       props = _objectWithoutProperties(_ref, _excluded$1);
 
   // @ts-ignore
-  return useAnimatedRoutes(routes, props, parentMatches);
+  return useAnimatedRoutes(routes, props, true);
 };
 /**
  * 类似于useRoutes，使用useAnimatedRoutes则可以给该组路由增加切换动画
@@ -132,9 +136,14 @@ var InternalAnimatedRoutes = function InternalAnimatedRoutes(_ref) {
 
 
 function useAnimatedRoutes(routes, props) {
+  var __INTERNAL__ = arguments[2];
   var baseLocation = useLocation();
   var rootRef = useRef(null);
-  var parentMatches = arguments[2];
+
+  var _useContext = useContext(ParentMatchesContext),
+      parentMatches = _useContext.parentMatches,
+      parentBase = _useContext.parentBase,
+      parentLocation = _useContext.location;
 
   var _ref2 = props || {},
       className = _ref2.className,
@@ -147,7 +156,7 @@ function useAnimatedRoutes(routes, props) {
       transitionKey = _ref2.transitionKey,
       component = _ref2.component,
       _ref2$location = _ref2.location,
-      location = _ref2$location === void 0 ? baseLocation : _ref2$location;
+      location = _ref2$location === void 0 ? parentLocation || baseLocation : _ref2$location;
 
   var self = useRef({
     inTransition: false
@@ -158,24 +167,37 @@ function useAnimatedRoutes(routes, props) {
   }
 
   var routeMatches = useMemo(function () {
-    return parentMatches || matchRoutes(routes, location);
-  }, [location, routes, parentMatches]) || [];
+    var _parentMatches;
+
+    if (__INTERNAL__) {
+      return parentMatches;
+    } // eslint-disable-next-line
+
+
+    parentBase = [parentMatches === null || parentMatches === void 0 ? void 0 : (_parentMatches = parentMatches[parentMatches.length - 1]) === null || _parentMatches === void 0 ? void 0 : _parentMatches.pathnameBase, parentBase].filter(Boolean).join('/').replace(/\/\/+/g, '/');
+    return matchRoutes(routes, location, parentBase);
+  }, [location, routes, parentMatches, __INTERNAL__]) || [];
   var routeIndex = routeMatches.findIndex(function (match) {
     return routes.includes(match.route);
   });
 
   if (!transitionKey && routeIndex > -1) {
-    transitionKey = "".concat(routes.indexOf(routeMatches[routeIndex].route), "_").concat(routeMatches[routeIndex].pathname);
+    transitionKey = "".concat(routes.indexOf(routeMatches[routeIndex].route), "_").concat(routeMatches[routeIndex].pathnameBase);
   }
 
-  var children = useRoutes(routes.map(function (route) {
+  var children = /*#__PURE__*/React.createElement(ParentMatchesContext.Provider, {
+    value: {
+      parentMatches: routeMatches,
+      parentBase: parentBase,
+      location: location
+    }
+  }, useRoutes(routes.map(function (route) {
     var _route$children;
 
     if ((_route$children = route.children) !== null && _route$children !== void 0 && _route$children.length) {
       var animatedElement = /*#__PURE__*/React.createElement(InternalAnimatedRoutes, Object.assign({}, props, {
         routes: route.children,
-        location: location,
-        parentMatches: routeMatches
+        location: location
       }));
       return _objectSpread2(_objectSpread2({}, route), {}, {
         children: [{
@@ -186,7 +208,7 @@ function useAnimatedRoutes(routes, props) {
     }
 
     return route;
-  }), location);
+  }), location));
   var setInTransition = useCallback(function (isAdd) {
     if (self.rootNode) {
       var inName = "".concat(prefix, "-in-transition");
@@ -239,7 +261,7 @@ function useAnimatedRoutes(routes, props) {
     self.rootNode = findDOMNode(rootRef.current);
   }, [self]);
 
-  if (isSSR || !children) {
+  if (isSSR) {
     return children;
   }
 
