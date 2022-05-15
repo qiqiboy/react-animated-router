@@ -98,7 +98,7 @@ export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterP
             }
 
             // eslint-disable-next-line
-            parentBase = [parentMatches?.[parentMatches.length - 1]?.pathnameBase, parentBase]
+            parentBase = [parentBase, parentMatches?.[parentMatches.length - 1]?.pathnameBase]
                 .filter(Boolean)
                 .join('/')
                 .replace(/\/\/+/g, '/');

@@ -219,7 +219,7 @@ function useAnimatedRoutes(routes, props) {
     } // eslint-disable-next-line
 
 
-    parentBase = [parentMatches === null || parentMatches === void 0 ? void 0 : (_parentMatches = parentMatches[parentMatches.length - 1]) === null || _parentMatches === void 0 ? void 0 : _parentMatches.pathnameBase, parentBase].filter(Boolean).join('/').replace(/\/\/+/g, '/');
+    parentBase = [parentBase, parentMatches === null || parentMatches === void 0 ? void 0 : (_parentMatches = parentMatches[parentMatches.length - 1]) === null || _parentMatches === void 0 ? void 0 : _parentMatches.pathnameBase].filter(Boolean).join('/').replace(/\/\/+/g, '/');
     return reactRouter.matchRoutes(routes, location, parentBase);
   }, [location, routes, parentMatches, __INTERNAL__]) || [];
   var routeIndex = routeMatches.findIndex(function (match) {

@@ -1,6 +1,6 @@
 {
   "name": "react-animated-router",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Dynamic transitions with react-router and react-transition-group",
   "author": "qiqiboy",
   "main": "dist/index.cjs.js",
@@ -18,6 +18,16 @@
     "animate.css",
     "dist/",
     "src/"
+  ],
+  "keywords": [
+    "react-router",
+    "react-component",
+    "react-transition-router",
+    "react-animation-router",
+    "router-animations",
+    "animation",
+    "transition",
+    "motion"
   ],
   "scripts": {
     "build": "rimraf dist && tsc --emitDeclarationOnly && rollup -c",
