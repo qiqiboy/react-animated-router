@@ -3,9 +3,8 @@ import { RouteMatch, Location } from 'react-router';
 
 export const ParentMatchesContext = createContext<{
     parentMatches: RouteMatch[] | null;
-    parentBase: string;
+    parentBase?: string;
     location?: Partial<Location> | string;
 }>({
-    parentMatches: null,
-    parentBase: ''
+    parentMatches: null
 });

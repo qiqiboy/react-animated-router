@@ -3,7 +3,7 @@ import { Location, RouteObject } from 'react-router';
 import { TransitionActions } from 'react-transition-group/Transition';
 export interface AnimatedRouterProps extends TransitionActions {
     className?: string;
-    transitionKey?: string | number;
+    pathnameBase?: string;
     timeout?: number;
     prefix?: string;
     component?: React.ElementType | null;

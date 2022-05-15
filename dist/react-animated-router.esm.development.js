@@ -80,8 +80,7 @@ function _objectSpread2(target) {
 }
 
 var ParentMatchesContext = createContext({
-  parentMatches: null,
-  parentBase: ''
+  parentMatches: null
 });
 
 var _excluded$1 = ["routes"];
@@ -135,29 +134,28 @@ var InternalAnimatedRoutes = function InternalAnimatedRoutes(_ref) {
  */
 
 
-function useAnimatedRoutes(routes, props) {
+function useAnimatedRoutes(routes) {
+  var props = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var __INTERNAL__ = arguments[2];
   var baseLocation = useLocation();
   var rootRef = useRef(null);
 
   var _useContext = useContext(ParentMatchesContext),
       parentMatches = _useContext.parentMatches,
-      parentBase = _useContext.parentBase,
+      _useContext$parentBas = _useContext.parentBase,
+      parentBase = _useContext$parentBas === void 0 ? props.pathnameBase : _useContext$parentBas,
       parentLocation = _useContext.location;
 
-  var _ref2 = props || {},
-      className = _ref2.className,
-      timeout = _ref2.timeout,
-      _ref2$prefix = _ref2.prefix,
-      prefix = _ref2$prefix === void 0 ? 'animated-router' : _ref2$prefix,
-      appear = _ref2.appear,
-      enter = _ref2.enter,
-      exit = _ref2.exit,
-      transitionKey = _ref2.transitionKey,
-      component = _ref2.component,
-      _ref2$location = _ref2.location,
-      location = _ref2$location === void 0 ? parentLocation || baseLocation : _ref2$location;
-
+  var className = props.className,
+      timeout = props.timeout,
+      _props$prefix = props.prefix,
+      prefix = _props$prefix === void 0 ? 'animated-router' : _props$prefix,
+      appear = props.appear,
+      enter = props.enter,
+      exit = props.exit,
+      component = props.component,
+      _props$location = props.location,
+      location = _props$location === void 0 ? parentLocation || baseLocation : _props$location;
   var self = useRef({
     inTransition: false
   }).current;
@@ -177,14 +175,10 @@ function useAnimatedRoutes(routes, props) {
     parentBase = [parentBase, parentMatches === null || parentMatches === void 0 ? void 0 : (_parentMatches = parentMatches[parentMatches.length - 1]) === null || _parentMatches === void 0 ? void 0 : _parentMatches.pathnameBase].filter(Boolean).join('/').replace(/\/\/+/g, '/');
     return matchRoutes(routes, location, parentBase);
   }, [location, routes, parentMatches, __INTERNAL__]) || [];
-  var routeIndex = routeMatches.findIndex(function (match) {
+  var routeMatch = routeMatches.find(function (match) {
     return routes.includes(match.route);
   });
-
-  if (!transitionKey && routeIndex > -1) {
-    transitionKey = "".concat(routes.indexOf(routeMatches[routeIndex].route), "_").concat(routeMatches[routeIndex].pathnameBase);
-  }
-
+  var transitionKey = routeMatch && "".concat(routes.indexOf(routeMatch.route), "_").concat(routeMatch.pathnameBase);
   var children = /*#__PURE__*/React.createElement(ParentMatchesContext.Provider, {
     value: {
       parentMatches: routeMatches,
@@ -309,7 +303,7 @@ var AnimatedRouter = function AnimatedRouter(_ref) {
 
 AnimatedRouter.propTypes = {
   className: PropTypes.string,
-  transitionKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  pathnameBase: PropTypes.string,
   timeout: PropTypes.number,
   prefix: PropTypes.string,
   appear: PropTypes.bool,

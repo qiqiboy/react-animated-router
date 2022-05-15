@@ -6,13 +6,13 @@ react 路由切换动画，支持嵌套路由 (nested routers)和动态路由（
 
 <!-- vim-markdown-toc GFM -->
 
--   [安装](#安装)
--   [如何使用](#如何使用)
-    -   [`AnimatedRouter`组件模式调用](#animatedrouter组件模式调用)
-    -   [`useAnimatedRoutes` Hooks 模式调用](#useanimatedroutes-hooks-模式调用)
-    -   [参数说明](#参数说明)
--   [自定义动画](#自定义动画)
--   [FAQ](#faq)
+- [安装](#安装)
+- [如何使用](#如何使用)
+    + [`AnimatedRouter`组件模式调用](#animatedrouter组件模式调用)
+    + [`useAnimatedRoutes` Hooks 模式调用](#useanimatedroutes-hooks-模式调用)
+    + [参数说明](#参数说明)
+- [自定义动画](#自定义动画)
+- [FAQ](#faq)
 
 <!-- vim-markdown-toc -->
 
@@ -158,17 +158,17 @@ interface AnimatedRouterProps extends TransitionActions {
 
 主要参数说明：
 
-|     属性      |           类型            |      默认值       | 描述                                                                                                                                                                                                                             |
-| :-----------: | :-----------------------: | :---------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|    prefix     |      `string`，可选       | `animated-router` | 应用到 CSSTransition 组件的 classNames 前缀。如果要在同一个项目中使用不同的动画，可以通过设置前缀来定义不同的动画。关于如何自定义动画，请查看下方说明                                                                            |
-|    timeout    |      `number`，可选       |        无         | 动画持续时间（毫秒），可以不传，默认为监听 transitionend 时间来判断动画结束。如果有动画异常，可以尝试设置该值，需要注意的是，该值应该与动画样式中定义的过渡时间一致                                                              |
-|   className   |      `string`，可选       |        无         | 如果传入 className 则会添加到动画节点所在容器节点上                                                                                                                                                                              |
-| transitionKey |      `string`，可选       |        无         | 开始该属性用于标识路由动画节点，默认情况下为变换的路由所对应的`pathname`地址；`AnimatedRouter`已经智能处理了路由嵌套的情形，一般无需特定制定该参数。如果在嵌套路由场景中，要控制子路由变换时，父级路由的动画方式，可以传递该参数 |
-|   component   |      `boolean`，可选      |       'div'       | AnimatedRouter 默认会 render 一个 div 节点，你可以通过该字段修改 render 的节点类型，例如，`component="section"`将会 render `<section>`节点。在 react v16+中，可以传入 `null` 来避免渲染该节点。                                  |
-|    appear     |      `boolean`，可选      |       false       | [文档：appear](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-appear)：是否启用组件首次挂载动画（启用的话将会触发 enter 进场动画）                                                       |
-|     enter     |      `boolean`，可选      |       true        | [文档：enter](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-enter)：是否启用进场动画                                                                                                    |
-|     exit      |      `boolean`，可选      |       true        | [文档：exit](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-exit)：是否启用离场动画                                                                                                      |
-|   location    | `Location` `string`，可选 |   当前页面地址    | 等同于`Routes`的同名属性，一般无需指定，除非你要渲染匹配与当前页面地址不一样路由                                                                                                                                                 |
+|     属性     |           类型            |      默认值       | 描述                                                                                                                                                                                                                                                  |
+| :----------: | :-----------------------: | :---------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|    prefix    |      `string`，可选       | `animated-router` | 应用到 CSSTransition 组件的 classNames 前缀。如果要在同一个项目中使用不同的动画，可以通过设置前缀来定义不同的动画。关于如何自定义动画，请查看下方说明                                                                                                 |
+|   timeout    |      `number`，可选       |        无         | 动画持续时间（毫秒），可以不传，默认为监听 transitionend 时间来判断动画结束。如果有动画异常，可以尝试设置该值，需要注意的是，该值应该与动画样式中定义的过渡时间一致                                                                                   |
+|  className   |      `string`，可选       |        无         | 如果传入 className 则会添加到动画节点所在容器节点上                                                                                                                                                                                                   |
+| pathnameBase |      `string`，可选       |        无         | **如果父级路由没有使用`AniamtedRouter`**，那么在子页面中再调用`AniamtedRouter`，就需要传递该子页面的路由地址（不包括最后的`*`），例如在`{path: '/sub/*', element: <SubPage />}`的`SubPage`组件中调用`AnimatedRouter`，需要传递 `pathnameBase: '/sub'` |
+|  component   |      `boolean`，可选      |       'div'       | AnimatedRouter 默认会 render 一个 div 节点，你可以通过该字段修改 render 的节点类型，例如，`component="section"`将会 render `<section>`节点。在 react v16+中，可以传入 `null` 来避免渲染该节点。                                                       |
+|    appear    |      `boolean`，可选      |       false       | [文档：appear](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-appear)：是否启用组件首次挂载动画（启用的话将会触发 enter 进场动画）                                                                            |
+|    enter     |      `boolean`，可选      |       true        | [文档：enter](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-enter)：是否启用进场动画                                                                                                                         |
+|     exit     |      `boolean`，可选      |       true        | [文档：exit](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-exit)：是否启用离场动画                                                                                                                           |
+|   location   | `Location` `string`，可选 |   当前页面地址    | 等同于`Routes`的同名属性，一般无需指定，除非你要渲染匹配与当前页面地址不一样路由                                                                                                                                                                      |
 
 ### 自定义动画
 
@@ -199,8 +199,8 @@ interface AnimatedRouterProps extends TransitionActions {
     A: 如果使用路由嵌套，开发环境下在控制台可能会出现如下警告，这不会对实际路由渲染有任何影响。如果有您有更好地实现可以消除该警告，请`PR`
 
 ```bash
-router.ts:11 You rendered descendant <Routes> (or called `useRoutes()`) at 
+router.ts:11 You rendered descendant <Routes> (or called `useRoutes()`) at
 "/invoices/" (under <Route path="">) but the parent route path has no trailing "*".
-This means if you navigate deeper,the parent won't match anymore and 
+This means if you navigate deeper,the parent won't match anymore and
 therefore the child routes will never render.
 ```

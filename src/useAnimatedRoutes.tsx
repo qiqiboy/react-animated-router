@@ -40,7 +40,7 @@ const isHistoryPush = (location, update) => {
 
 export interface AnimatedRouterProps extends TransitionActions {
     className?: string;
-    transitionKey?: string | number;
+    pathnameBase?: string;
     timeout?: number;
     prefix?: string;
     component?: React.ElementType | null;
@@ -62,11 +62,11 @@ const InternalAnimatedRoutes: React.FC<
  * @param routes 路由配置数组
  * @param props 设置项
  */
-export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterProps): React.ReactElement | null {
+export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterProps = {}): React.ReactElement | null {
     const __INTERNAL__ = arguments[2];
     const baseLocation = useLocation();
     const rootRef = useRef<TransitionGroup>(null);
-    let { parentMatches, parentBase, location: parentLocation } = useContext(ParentMatchesContext);
+    let { parentMatches, parentBase = props.pathnameBase, location: parentLocation } = useContext(ParentMatchesContext);
 
     let {
         className,
@@ -75,10 +75,9 @@ export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterP
         appear,
         enter,
         exit,
-        transitionKey,
         component,
         location = parentLocation || baseLocation
-    } = props || {};
+    } = props;
     const self = useRef<{
         inTransition: boolean;
         rootNode?: Element;
@@ -106,11 +105,8 @@ export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterP
             return matchRoutes(routes, location, parentBase);
         }, [location, routes, parentMatches, __INTERNAL__]) || [];
 
-    const routeIndex = routeMatches.findIndex(match => routes.includes(match.route));
-
-    if (!transitionKey && routeIndex > -1) {
-        transitionKey = `${routes.indexOf(routeMatches[routeIndex].route)}_${routeMatches[routeIndex].pathnameBase}`;
-    }
+    const routeMatch = routeMatches.find(match => routes.includes(match.route));
+    const transitionKey = routeMatch && `${routes.indexOf(routeMatch.route)}_${routeMatch.pathnameBase}`;
 
     const children = (
         <ParentMatchesContext.Provider
