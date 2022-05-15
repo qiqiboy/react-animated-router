@@ -10,7 +10,7 @@ react 路由切换动画，支持嵌套路由 (nested routers)和动态路由（
 - [如何使用](#如何使用)
     + [`AnimatedRouter`组件模式调用](#animatedrouter组件模式调用)
     + [`useAnimatedRoutes` Hooks 模式调用](#useanimatedroutes-hooks-模式调用)
-    + [参数说明](#参数说明)
+    + [配置参数说明](#配置参数说明)
 - [自定义动画](#自定义动画)
 - [FAQ](#faq)
 
@@ -105,6 +105,10 @@ render(
 
 > **请注意，名字是`useAnimatedRoutes`，不是`useAnimatedRouter`!!**
 
+```typescript
+declare function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterProps): React.ReactElement | null;
+```
+
 你可以将项目中的`useRoutes`使用`useAnimatedRoutes`代替，就可以给页面切换带来动画效果！
 
 ```javascript
@@ -142,13 +146,13 @@ render(
 );
 ```
 
-#### 参数说明
+#### 配置参数说明
 
 ```typescript
 // TransitionActions 为 react-transition-group 定义
 interface AnimatedRouterProps extends TransitionActions {
     className?: string;
-    transitionKey?: string | number;
+    pathnameBase?: string;
     timeout?: number;
     prefix?: string;
     component?: React.ElementType | null;
@@ -163,7 +167,7 @@ interface AnimatedRouterProps extends TransitionActions {
 |    prefix    |      `string`，可选       | `animated-router` | 应用到 CSSTransition 组件的 classNames 前缀。如果要在同一个项目中使用不同的动画，可以通过设置前缀来定义不同的动画。关于如何自定义动画，请查看下方说明                                                                                                 |
 |   timeout    |      `number`，可选       |        无         | 动画持续时间（毫秒），可以不传，默认为监听 transitionend 时间来判断动画结束。如果有动画异常，可以尝试设置该值，需要注意的是，该值应该与动画样式中定义的过渡时间一致                                                                                   |
 |  className   |      `string`，可选       |        无         | 如果传入 className 则会添加到动画节点所在容器节点上                                                                                                                                                                                                   |
-| pathnameBase |      `string`，可选       |        无         | **如果父级路由没有使用`AniamtedRouter`**，那么在子页面中再调用`AniamtedRouter`，就需要传递该子页面的路由地址（不包括最后的`*`），例如在`{path: '/sub/*', element: <SubPage />}`的`SubPage`组件中调用`AnimatedRouter`，需要传递 `pathnameBase: '/sub'` |
+| pathnameBase |      `string`，可选       |        无         | **如果父级路由没有使用`AnimatedRouter`**，那么在子页面中再调用`AnimatedRouter`，就需要传递该子页面的路由地址（不包括最后的`*`），例如在`{path: '/sub/*', element: <SubPage />}`的`SubPage`组件中调用`AnimatedRouter`，需要传递 `pathnameBase: '/sub'` |
 |  component   |      `boolean`，可选      |       'div'       | AnimatedRouter 默认会 render 一个 div 节点，你可以通过该字段修改 render 的节点类型，例如，`component="section"`将会 render `<section>`节点。在 react v16+中，可以传入 `null` 来避免渲染该节点。                                                       |
 |    appear    |      `boolean`，可选      |       false       | [文档：appear](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-appear)：是否启用组件首次挂载动画（启用的话将会触发 enter 进场动画）                                                                            |
 |    enter     |      `boolean`，可选      |       true        | [文档：enter](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-enter)：是否启用进场动画                                                                                                                         |
