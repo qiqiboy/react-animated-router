@@ -1,6 +1,14 @@
 import React, { useState, useCallback, useContext, useMemo, useRef, cloneElement } from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { Location, RouteObject, useLocation, useRoutes, matchRoutes, parsePath } from 'react-router';
+import {
+    Location,
+    RouteObject,
+    useLocation,
+    useRoutes,
+    matchRoutes,
+    parsePath,
+    UNSAFE_RouteContext
+} from 'react-router';
 import { TransitionActions } from 'react-transition-group/Transition';
 import { AnimatedRouterContext } from './context';
 
@@ -39,7 +47,6 @@ const isHistoryPush = (location, update) => {
 
 export interface AnimatedRouterProps extends TransitionActions {
     className?: string;
-    pathnameBase?: string;
     timeout?: number;
     prefix?: string;
     component?: React.ElementType | null;
@@ -64,11 +71,8 @@ const InternalAnimatedRoutes: React.FC<
 export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterProps = {}): React.ReactElement | null {
     const __INTERNAL__ = arguments[2];
     const baseLocation = useLocation();
-    let {
-        parentMatches,
-        parentBase = props.pathnameBase,
-        location: parentLocation
-    } = useContext(AnimatedRouterContext);
+    const { matches: baseMatches } = useContext(UNSAFE_RouteContext);
+    let { routeMatches, location: contextLocation } = useContext(AnimatedRouterContext);
 
     let {
         className,
@@ -78,7 +82,7 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
         enter,
         exit,
         component,
-        location = parentLocation || baseLocation
+        location = contextLocation || baseLocation
     } = props;
     const [rootNodeId] = useState(() => `${prefix}-root-${Math.random().toString(36).slice(2)}`);
     const self = useRef<{
@@ -93,37 +97,27 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
         location = parsePath(location);
     }
 
-    parentBase = useMemo(
+    routeMatches = useMemo(
         () =>
-            __INTERNAL__
-                ? parentBase
-                : [parentBase, parentMatches?.[parentMatches.length - 1]?.pathnameBase]
-                      .filter(Boolean)
-                      .join('/')
-                      .replace(/\/\/+/g, '/'),
-        [parentMatches, parentBase, __INTERNAL__]
+            (__INTERNAL__
+                ? routeMatches
+                : matchRoutes(routes, location, baseMatches[baseMatches.length - 1]?.pathnameBase)) || [],
+        [location, routes, baseMatches, routeMatches, __INTERNAL__]
     );
 
-    const routeMatches = useMemo(
-        () => (__INTERNAL__ ? parentMatches : matchRoutes(routes, location, parentBase)) || [],
-        [location, routes, parentMatches, parentBase, __INTERNAL__]
-    );
     const routeMatch = routeMatches.find(match => routes.includes(match.route));
     const transitionKey = routeMatch && `${routes.indexOf(routeMatch.route)}_${routeMatch.pathnameBase}`;
 
     const children = (
         <AnimatedRouterContext.Provider
             value={{
-                parentMatches: routeMatches,
-                parentBase,
+                routeMatches,
                 location
             }}>
             {useRoutes(
                 routes.map(route => {
                     if (route.children?.length) {
-                        const animatedElement = (
-                            <InternalAnimatedRoutes {...props} routes={route.children} location={location} />
-                        );
+                        const animatedElement = <InternalAnimatedRoutes {...props} routes={route.children} />;
 
                         return typeof route.element === 'undefined'
                             ? {

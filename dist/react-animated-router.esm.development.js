@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useLocation, parsePath, matchRoutes, useRoutes, createRoutesFromChildren } from 'react-router';
+import { useLocation, UNSAFE_RouteContext, parsePath, matchRoutes, useRoutes, createRoutesFromChildren } from 'react-router';
 import React, { createContext, useContext, useState, useRef, useMemo, cloneElement, useCallback } from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
@@ -140,7 +140,7 @@ function _slicedToArray(arr, i) {
 }
 
 var AnimatedRouterContext = createContext({
-  parentMatches: null
+  routeMatches: []
 });
 AnimatedRouterContext.displayName = 'AnimatedRouterContext';
 
@@ -200,11 +200,12 @@ function useAnimatedRoutes(routes) {
   var __INTERNAL__ = arguments[2];
   var baseLocation = useLocation();
 
-  var _useContext = useContext(AnimatedRouterContext),
-      parentMatches = _useContext.parentMatches,
-      _useContext$parentBas = _useContext.parentBase,
-      parentBase = _useContext$parentBas === void 0 ? props.pathnameBase : _useContext$parentBas,
-      parentLocation = _useContext.location;
+  var _useContext = useContext(UNSAFE_RouteContext),
+      baseMatches = _useContext.matches;
+
+  var _useContext2 = useContext(AnimatedRouterContext),
+      routeMatches = _useContext2.routeMatches,
+      contextLocation = _useContext2.location;
 
   var className = props.className,
       timeout = props.timeout,
@@ -215,7 +216,7 @@ function useAnimatedRoutes(routes) {
       exit = props.exit,
       component = props.component,
       _props$location = props.location,
-      location = _props$location === void 0 ? parentLocation || baseLocation : _props$location;
+      location = _props$location === void 0 ? contextLocation || baseLocation : _props$location;
 
   var _useState = useState(function () {
     return "".concat(prefix, "-root-").concat(Math.random().toString(36).slice(2));
@@ -231,22 +232,18 @@ function useAnimatedRoutes(routes) {
     location = parsePath(location);
   }
 
-  parentBase = useMemo(function () {
-    var _parentMatches;
+  routeMatches = useMemo(function () {
+    var _baseMatches;
 
-    return __INTERNAL__ ? parentBase : [parentBase, parentMatches === null || parentMatches === void 0 ? void 0 : (_parentMatches = parentMatches[parentMatches.length - 1]) === null || _parentMatches === void 0 ? void 0 : _parentMatches.pathnameBase].filter(Boolean).join('/').replace(/\/\/+/g, '/');
-  }, [parentMatches, parentBase, __INTERNAL__]);
-  var routeMatches = useMemo(function () {
-    return (__INTERNAL__ ? parentMatches : matchRoutes(routes, location, parentBase)) || [];
-  }, [location, routes, parentMatches, parentBase, __INTERNAL__]);
+    return (__INTERNAL__ ? routeMatches : matchRoutes(routes, location, (_baseMatches = baseMatches[baseMatches.length - 1]) === null || _baseMatches === void 0 ? void 0 : _baseMatches.pathnameBase)) || [];
+  }, [location, routes, baseMatches, routeMatches, __INTERNAL__]);
   var routeMatch = routeMatches.find(function (match) {
     return routes.includes(match.route);
   });
   var transitionKey = routeMatch && "".concat(routes.indexOf(routeMatch.route), "_").concat(routeMatch.pathnameBase);
   var children = /*#__PURE__*/React.createElement(AnimatedRouterContext.Provider, {
     value: {
-      parentMatches: routeMatches,
-      parentBase: parentBase,
+      routeMatches: routeMatches,
       location: location
     }
   }, useRoutes(routes.map(function (route) {
@@ -254,8 +251,7 @@ function useAnimatedRoutes(routes) {
 
     if ((_route$children = route.children) !== null && _route$children !== void 0 && _route$children.length) {
       var animatedElement = /*#__PURE__*/React.createElement(InternalAnimatedRoutes, Object.assign({}, props, {
-        routes: route.children,
-        location: location
+        routes: route.children
       }));
       return typeof route.element === 'undefined' ? _objectSpread2(_objectSpread2({}, route), {}, {
         element: cloneElement(animatedElement, {
@@ -371,7 +367,6 @@ var AnimatedRouter = function AnimatedRouter(_ref) {
 
 AnimatedRouter.propTypes = {
   className: PropTypes.string,
-  pathnameBase: PropTypes.string,
   timeout: PropTypes.number,
   prefix: PropTypes.string,
   appear: PropTypes.bool,

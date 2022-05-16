@@ -231,7 +231,7 @@ module.exports = _slicedToArray, module.exports.__esModule = true, module.export
 var _slicedToArray = unwrapExports(slicedToArray);
 
 var AnimatedRouterContext = React.createContext({
-  parentMatches: null
+  routeMatches: []
 });
 AnimatedRouterContext.displayName = 'AnimatedRouterContext';
 
@@ -291,11 +291,12 @@ function useAnimatedRoutes(routes) {
   var __INTERNAL__ = arguments[2];
   var baseLocation = reactRouter.useLocation();
 
-  var _useContext = React.useContext(AnimatedRouterContext),
-      parentMatches = _useContext.parentMatches,
-      _useContext$parentBas = _useContext.parentBase,
-      parentBase = _useContext$parentBas === void 0 ? props.pathnameBase : _useContext$parentBas,
-      parentLocation = _useContext.location;
+  var _useContext = React.useContext(reactRouter.UNSAFE_RouteContext),
+      baseMatches = _useContext.matches;
+
+  var _useContext2 = React.useContext(AnimatedRouterContext),
+      routeMatches = _useContext2.routeMatches,
+      contextLocation = _useContext2.location;
 
   var className = props.className,
       timeout = props.timeout,
@@ -306,7 +307,7 @@ function useAnimatedRoutes(routes) {
       exit = props.exit,
       component = props.component,
       _props$location = props.location,
-      location = _props$location === void 0 ? parentLocation || baseLocation : _props$location;
+      location = _props$location === void 0 ? contextLocation || baseLocation : _props$location;
 
   var _useState = React.useState(function () {
     return "".concat(prefix, "-root-").concat(Math.random().toString(36).slice(2));
@@ -322,22 +323,18 @@ function useAnimatedRoutes(routes) {
     location = reactRouter.parsePath(location);
   }
 
-  parentBase = React.useMemo(function () {
-    var _parentMatches;
+  routeMatches = React.useMemo(function () {
+    var _baseMatches;
 
-    return __INTERNAL__ ? parentBase : [parentBase, parentMatches === null || parentMatches === void 0 ? void 0 : (_parentMatches = parentMatches[parentMatches.length - 1]) === null || _parentMatches === void 0 ? void 0 : _parentMatches.pathnameBase].filter(Boolean).join('/').replace(/\/\/+/g, '/');
-  }, [parentMatches, parentBase, __INTERNAL__]);
-  var routeMatches = React.useMemo(function () {
-    return (__INTERNAL__ ? parentMatches : reactRouter.matchRoutes(routes, location, parentBase)) || [];
-  }, [location, routes, parentMatches, parentBase, __INTERNAL__]);
+    return (__INTERNAL__ ? routeMatches : reactRouter.matchRoutes(routes, location, (_baseMatches = baseMatches[baseMatches.length - 1]) === null || _baseMatches === void 0 ? void 0 : _baseMatches.pathnameBase)) || [];
+  }, [location, routes, baseMatches, routeMatches, __INTERNAL__]);
   var routeMatch = routeMatches.find(function (match) {
     return routes.includes(match.route);
   });
   var transitionKey = routeMatch && "".concat(routes.indexOf(routeMatch.route), "_").concat(routeMatch.pathnameBase);
   var children = /*#__PURE__*/React__default["default"].createElement(AnimatedRouterContext.Provider, {
     value: {
-      parentMatches: routeMatches,
-      parentBase: parentBase,
+      routeMatches: routeMatches,
       location: location
     }
   }, reactRouter.useRoutes(routes.map(function (route) {
@@ -345,8 +342,7 @@ function useAnimatedRoutes(routes) {
 
     if ((_route$children = route.children) !== null && _route$children !== void 0 && _route$children.length) {
       var animatedElement = /*#__PURE__*/React__default["default"].createElement(InternalAnimatedRoutes, Object.assign({}, props, {
-        routes: route.children,
-        location: location
+        routes: route.children
       }));
       return typeof route.element === 'undefined' ? _objectSpread(_objectSpread({}, route), {}, {
         element: React.cloneElement(animatedElement, {
@@ -462,7 +458,6 @@ var AnimatedRouter = function AnimatedRouter(_ref) {
 
 AnimatedRouter.propTypes = {
   className: PropTypes__default["default"].string,
-  pathnameBase: PropTypes__default["default"].string,
   timeout: PropTypes__default["default"].number,
   prefix: PropTypes__default["default"].string,
   appear: PropTypes__default["default"].bool,

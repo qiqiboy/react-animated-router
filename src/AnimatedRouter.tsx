@@ -26,7 +26,6 @@ const AnimatedRouter: React.FC<
 
 AnimatedRouter.propTypes = {
     className: PropTypes.string,
-    pathnameBase: PropTypes.string,
     timeout: PropTypes.number,
     prefix: PropTypes.string,
     appear: PropTypes.bool,
