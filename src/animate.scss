@@ -45,9 +45,9 @@ $prefix: animated-router !default;
     /** END **/
 
     &-forward-appear-active,
-    &-backward-appear-active,
     &-forward-enter-active,
     &-forward-exit-active,
+    &-backward-appear-active,
     &-backward-enter-active,
     &-backward-exit-active {
         /* 不同过渡阶段需要的过渡时间与缓动效果 */

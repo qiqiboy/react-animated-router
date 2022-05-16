@@ -1,5 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import { findDOMNode } from 'react-dom';
+import React, { useState, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { Location, RouteMatch, RouteObject, useLocation, useRoutes, matchRoutes, parsePath } from 'react-router';
 import { TransitionActions } from 'react-transition-group/Transition';
@@ -65,7 +64,6 @@ const InternalAnimatedRoutes: React.FC<
 export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterProps = {}): React.ReactElement | null {
     const __INTERNAL__ = arguments[2];
     const baseLocation = useLocation();
-    const rootRef = useRef<TransitionGroup>(null);
     let { parentMatches, parentBase = props.pathnameBase, location: parentLocation } = useContext(ParentMatchesContext);
 
     let {
@@ -78,6 +76,7 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
         component,
         location = parentLocation || baseLocation
     } = props;
+    const [rootNodeId] = useState(() => `${prefix}-root-${Math.random().toString(36).slice(2)}`);
     const self = useRef<{
         inTransition: boolean;
         rootNode?: Element;
@@ -213,11 +212,13 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
         onEntering,
         onEntered
     };
-    const cls = [`${prefix}-container`, 'react-animated-router', className];
+    const cls = ['react-animated-router', `${prefix}-container`, rootNodeId, className];
 
     useEffect(() => {
-        self.rootNode = findDOMNode(rootRef.current) as Element;
-    }, [self]);
+        self.rootNode = document.querySelector(`.${rootNodeId}`) as Element;
+
+        self.inTransition && setInTransition(true);
+    }, [rootNodeId, setInTransition, self]);
 
     if (isSSR) {
         return children;
@@ -225,7 +226,6 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
 
     return (
         <TransitionGroup
-            ref={rootRef}
             className={cls.filter(Boolean).join(' ')}
             childFactory={child => {
                 const classNames = `${prefix}-${isHistoryPush(location, child.props.in) ? 'forward' : 'backward'}`;

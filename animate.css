@@ -36,7 +36,7 @@
 .animated-router-backward-exit-active {
   transform: translate(100%);
 }
-.animated-router-forward-appear-active, .animated-router-backward-appear-active, .animated-router-forward-enter-active, .animated-router-forward-exit-active, .animated-router-backward-enter-active, .animated-router-backward-exit-active {
+.animated-router-forward-appear-active, .animated-router-forward-enter-active, .animated-router-forward-exit-active, .animated-router-backward-appear-active, .animated-router-backward-enter-active, .animated-router-backward-exit-active {
   /* 不同过渡阶段需要的过渡时间与缓动效果 */
   transition: transform 0.3s linear;
 }

@@ -5,7 +5,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var PropTypes = require('prop-types');
 var reactRouter = require('react-router');
 var React = require('react');
-var reactDom = require('react-dom');
 var reactTransitionGroup = require('react-transition-group');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -124,6 +123,113 @@ module.exports = _objectSpread2, module.exports.__esModule = true, module.export
 
 var _objectSpread = unwrapExports(objectSpread2);
 
+var arrayWithHoles$1 = createCommonjsModule(function (module) {
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+module.exports = _arrayWithHoles, module.exports.__esModule = true, module.exports["default"] = module.exports;
+});
+
+unwrapExports(arrayWithHoles$1);
+
+var iterableToArrayLimit$1 = createCommonjsModule(function (module) {
+function _iterableToArrayLimit(arr, i) {
+  var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+
+  if (_i == null) return;
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+
+  var _s, _e;
+
+  try {
+    for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+module.exports = _iterableToArrayLimit, module.exports.__esModule = true, module.exports["default"] = module.exports;
+});
+
+unwrapExports(iterableToArrayLimit$1);
+
+var arrayLikeToArray$1 = createCommonjsModule(function (module) {
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+
+  return arr2;
+}
+
+module.exports = _arrayLikeToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
+});
+
+unwrapExports(arrayLikeToArray$1);
+
+var arrayLikeToArray = arrayLikeToArray$1;
+
+var unsupportedIterableToArray$1 = createCommonjsModule(function (module) {
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return arrayLikeToArray(o, minLen);
+}
+
+module.exports = _unsupportedIterableToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
+});
+
+unwrapExports(unsupportedIterableToArray$1);
+
+var nonIterableRest$1 = createCommonjsModule(function (module) {
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
+module.exports = _nonIterableRest, module.exports.__esModule = true, module.exports["default"] = module.exports;
+});
+
+unwrapExports(nonIterableRest$1);
+
+var arrayWithHoles = arrayWithHoles$1;
+
+var iterableToArrayLimit = iterableToArrayLimit$1;
+
+var unsupportedIterableToArray = unsupportedIterableToArray$1;
+
+var nonIterableRest = nonIterableRest$1;
+
+var slicedToArray = createCommonjsModule(function (module) {
+function _slicedToArray(arr, i) {
+  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();
+}
+
+module.exports = _slicedToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
+});
+
+var _slicedToArray = unwrapExports(slicedToArray);
+
 var ParentMatchesContext = React.createContext({
   parentMatches: null
 });
@@ -183,7 +289,6 @@ function useAnimatedRoutes(routes) {
   var props = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var __INTERNAL__ = arguments[2];
   var baseLocation = reactRouter.useLocation();
-  var rootRef = React.useRef(null);
 
   var _useContext = React.useContext(ParentMatchesContext),
       parentMatches = _useContext.parentMatches,
@@ -201,6 +306,13 @@ function useAnimatedRoutes(routes) {
       component = props.component,
       _props$location = props.location,
       location = _props$location === void 0 ? parentLocation || baseLocation : _props$location;
+
+  var _useState = React.useState(function () {
+    return "".concat(prefix, "-root-").concat(Math.random().toString(36).slice(2));
+  }),
+      _useState2 = _slicedToArray(_useState, 1),
+      rootNodeId = _useState2[0];
+
   var self = React.useRef({
     inTransition: false
   }).current;
@@ -295,17 +407,17 @@ function useAnimatedRoutes(routes) {
     onEntering: onEntering,
     onEntered: onEntered
   };
-  var cls = ["".concat(prefix, "-container"), 'react-animated-router', className];
+  var cls = ['react-animated-router', "".concat(prefix, "-container"), rootNodeId, className];
   React.useEffect(function () {
-    self.rootNode = reactDom.findDOMNode(rootRef.current);
-  }, [self]);
+    self.rootNode = document.querySelector(".".concat(rootNodeId));
+    self.inTransition && setInTransition(true);
+  }, [rootNodeId, setInTransition, self]);
 
   if (isSSR) {
     return children;
   }
 
   return /*#__PURE__*/React__default["default"].createElement(reactTransitionGroup.TransitionGroup, Object.assign({
-    ref: rootRef,
     className: cls.filter(Boolean).join(' '),
     childFactory: function childFactory(child) {
       var classNames = "".concat(prefix, "-").concat(isHistoryPush(location, child.props.in) ? 'forward' : 'backward');
