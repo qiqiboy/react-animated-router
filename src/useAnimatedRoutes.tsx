@@ -228,10 +228,10 @@ export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterP
             </AnimatedRouterContext.Provider>
         </InternalAnimatedRoutes>
     );
-    const addAnimation = (routes: RouteObject[]): RouteObject[] =>
+    const injectAnimation = (routes: RouteObject[]): RouteObject[] =>
         routes.map(route => {
             if (route.children?.length) {
-                const animatedChildren = addAnimation(route.children);
+                const animatedChildren = injectAnimation(route.children);
                 const animatedElement = wrapInternalAnimatedRoutes(animatedChildren, <Outlet />);
 
                 return typeof route.element === 'undefined'
@@ -256,7 +256,7 @@ export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterP
             return route;
         });
 
-    const animatedRoutes = addAnimation(routes);
+    const animatedRoutes = injectAnimation(routes);
     const children = useRoutes(animatedRoutes, location);
 
     return wrapInternalAnimatedRoutes(animatedRoutes, children);
