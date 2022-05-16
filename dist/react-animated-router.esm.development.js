@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useLocation, parsePath, matchRoutes, useRoutes, createRoutesFromChildren } from 'react-router';
-import React, { createContext, useContext, useState, useRef, useMemo, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef, useMemo, cloneElement, useCallback } from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 function _objectWithoutPropertiesLoose(source, excluded) {
@@ -139,9 +139,10 @@ function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
-var ParentMatchesContext = createContext({
+var AnimatedRouterContext = createContext({
   parentMatches: null
 });
+AnimatedRouterContext.displayName = 'AnimatedRouterContext';
 
 var _excluded$1 = ["routes"];
 var isSSR = typeof window === 'undefined';
@@ -199,7 +200,7 @@ function useAnimatedRoutes(routes) {
   var __INTERNAL__ = arguments[2];
   var baseLocation = useLocation();
 
-  var _useContext = useContext(ParentMatchesContext),
+  var _useContext = useContext(AnimatedRouterContext),
       parentMatches = _useContext.parentMatches,
       _useContext$parentBas = _useContext.parentBase,
       parentBase = _useContext$parentBas === void 0 ? props.pathnameBase : _useContext$parentBas,
@@ -230,22 +231,19 @@ function useAnimatedRoutes(routes) {
     location = parsePath(location);
   }
 
-  var routeMatches = useMemo(function () {
+  parentBase = useMemo(function () {
     var _parentMatches;
 
-    if (__INTERNAL__) {
-      return parentMatches;
-    } // eslint-disable-next-line
-
-
-    parentBase = [parentBase, parentMatches === null || parentMatches === void 0 ? void 0 : (_parentMatches = parentMatches[parentMatches.length - 1]) === null || _parentMatches === void 0 ? void 0 : _parentMatches.pathnameBase].filter(Boolean).join('/').replace(/\/\/+/g, '/');
-    return matchRoutes(routes, location, parentBase);
-  }, [location, routes, parentMatches, __INTERNAL__]) || [];
+    return __INTERNAL__ ? parentBase : [parentBase, parentMatches === null || parentMatches === void 0 ? void 0 : (_parentMatches = parentMatches[parentMatches.length - 1]) === null || _parentMatches === void 0 ? void 0 : _parentMatches.pathnameBase].filter(Boolean).join('/').replace(/\/\/+/g, '/');
+  }, [parentMatches, parentBase, __INTERNAL__]);
+  var routeMatches = useMemo(function () {
+    return (__INTERNAL__ ? parentMatches : matchRoutes(routes, location, parentBase)) || [];
+  }, [location, routes, parentMatches, parentBase, __INTERNAL__]);
   var routeMatch = routeMatches.find(function (match) {
     return routes.includes(match.route);
   });
   var transitionKey = routeMatch && "".concat(routes.indexOf(routeMatch.route), "_").concat(routeMatch.pathnameBase);
-  var children = /*#__PURE__*/React.createElement(ParentMatchesContext.Provider, {
+  var children = /*#__PURE__*/React.createElement(AnimatedRouterContext.Provider, {
     value: {
       parentMatches: routeMatches,
       parentBase: parentBase,
@@ -259,7 +257,11 @@ function useAnimatedRoutes(routes) {
         routes: route.children,
         location: location
       }));
-      return _objectSpread2(_objectSpread2({}, route), {}, {
+      return typeof route.element === 'undefined' ? _objectSpread2(_objectSpread2({}, route), {}, {
+        element: cloneElement(animatedElement, {
+          component: null
+        })
+      }) : _objectSpread2(_objectSpread2({}, route), {}, {
         children: [{
           element: animatedElement,
           children: route.children
@@ -278,9 +280,13 @@ function useAnimatedRoutes(routes) {
     }
   }, [prefix, self]);
   var onEnter = useCallback(function (node) {
+    if (!self.rootNode) {
+      self.rootNode = component ? document.querySelector(".".concat(rootNodeId)) : node === null || node === void 0 ? void 0 : node.parentNode;
+    }
+
     self.inTransition || setInTransition(self.inTransition = true);
     self.lastTransitionNode = node;
-  }, [self, setInTransition]);
+  }, [self, setInTransition, rootNodeId, component]);
   var onEntering = useCallback(function (node) {
     if (node && typeof timeout === 'number') {
       node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = "".concat(timeout, "ms");
@@ -317,10 +323,6 @@ function useAnimatedRoutes(routes) {
     onEntered: onEntered
   };
   var cls = ['react-animated-router', "".concat(prefix, "-container"), rootNodeId, className];
-  useEffect(function () {
-    self.rootNode = document.querySelector(".".concat(rootNodeId));
-    self.inTransition && setInTransition(true);
-  }, [rootNodeId, setInTransition, self]);
 
   if (isSSR) {
     return children;

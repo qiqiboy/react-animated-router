@@ -230,9 +230,10 @@ module.exports = _slicedToArray, module.exports.__esModule = true, module.export
 
 var _slicedToArray = unwrapExports(slicedToArray);
 
-var ParentMatchesContext = React.createContext({
+var AnimatedRouterContext = React.createContext({
   parentMatches: null
 });
+AnimatedRouterContext.displayName = 'AnimatedRouterContext';
 
 var _excluded$1 = ["routes"];
 var isSSR = typeof window === 'undefined';
@@ -290,7 +291,7 @@ function useAnimatedRoutes(routes) {
   var __INTERNAL__ = arguments[2];
   var baseLocation = reactRouter.useLocation();
 
-  var _useContext = React.useContext(ParentMatchesContext),
+  var _useContext = React.useContext(AnimatedRouterContext),
       parentMatches = _useContext.parentMatches,
       _useContext$parentBas = _useContext.parentBase,
       parentBase = _useContext$parentBas === void 0 ? props.pathnameBase : _useContext$parentBas,
@@ -321,22 +322,19 @@ function useAnimatedRoutes(routes) {
     location = reactRouter.parsePath(location);
   }
 
-  var routeMatches = React.useMemo(function () {
+  parentBase = React.useMemo(function () {
     var _parentMatches;
 
-    if (__INTERNAL__) {
-      return parentMatches;
-    } // eslint-disable-next-line
-
-
-    parentBase = [parentBase, parentMatches === null || parentMatches === void 0 ? void 0 : (_parentMatches = parentMatches[parentMatches.length - 1]) === null || _parentMatches === void 0 ? void 0 : _parentMatches.pathnameBase].filter(Boolean).join('/').replace(/\/\/+/g, '/');
-    return reactRouter.matchRoutes(routes, location, parentBase);
-  }, [location, routes, parentMatches, __INTERNAL__]) || [];
+    return __INTERNAL__ ? parentBase : [parentBase, parentMatches === null || parentMatches === void 0 ? void 0 : (_parentMatches = parentMatches[parentMatches.length - 1]) === null || _parentMatches === void 0 ? void 0 : _parentMatches.pathnameBase].filter(Boolean).join('/').replace(/\/\/+/g, '/');
+  }, [parentMatches, parentBase, __INTERNAL__]);
+  var routeMatches = React.useMemo(function () {
+    return (__INTERNAL__ ? parentMatches : reactRouter.matchRoutes(routes, location, parentBase)) || [];
+  }, [location, routes, parentMatches, parentBase, __INTERNAL__]);
   var routeMatch = routeMatches.find(function (match) {
     return routes.includes(match.route);
   });
   var transitionKey = routeMatch && "".concat(routes.indexOf(routeMatch.route), "_").concat(routeMatch.pathnameBase);
-  var children = /*#__PURE__*/React__default["default"].createElement(ParentMatchesContext.Provider, {
+  var children = /*#__PURE__*/React__default["default"].createElement(AnimatedRouterContext.Provider, {
     value: {
       parentMatches: routeMatches,
       parentBase: parentBase,
@@ -350,7 +348,11 @@ function useAnimatedRoutes(routes) {
         routes: route.children,
         location: location
       }));
-      return _objectSpread(_objectSpread({}, route), {}, {
+      return typeof route.element === 'undefined' ? _objectSpread(_objectSpread({}, route), {}, {
+        element: React.cloneElement(animatedElement, {
+          component: null
+        })
+      }) : _objectSpread(_objectSpread({}, route), {}, {
         children: [{
           element: animatedElement,
           children: route.children
@@ -369,9 +371,13 @@ function useAnimatedRoutes(routes) {
     }
   }, [prefix, self]);
   var onEnter = React.useCallback(function (node) {
+    if (!self.rootNode) {
+      self.rootNode = component ? document.querySelector(".".concat(rootNodeId)) : node === null || node === void 0 ? void 0 : node.parentNode;
+    }
+
     self.inTransition || setInTransition(self.inTransition = true);
     self.lastTransitionNode = node;
-  }, [self, setInTransition]);
+  }, [self, setInTransition, rootNodeId, component]);
   var onEntering = React.useCallback(function (node) {
     if (node && typeof timeout === 'number') {
       node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = "".concat(timeout, "ms");
@@ -408,10 +414,6 @@ function useAnimatedRoutes(routes) {
     onEntered: onEntered
   };
   var cls = ['react-animated-router', "".concat(prefix, "-container"), rootNodeId, className];
-  React.useEffect(function () {
-    self.rootNode = document.querySelector(".".concat(rootNodeId));
-    self.inTransition && setInTransition(true);
-  }, [rootNodeId, setInTransition, self]);
 
   if (isSSR) {
     return children;

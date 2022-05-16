@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useContext, useMemo, useRef, cloneElement } from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { Location, RouteMatch, RouteObject, useLocation, useRoutes, matchRoutes, parsePath } from 'react-router';
+import { Location, RouteObject, useLocation, useRoutes, matchRoutes, parsePath } from 'react-router';
 import { TransitionActions } from 'react-transition-group/Transition';
-import { ParentMatchesContext } from './context';
+import { AnimatedRouterContext } from './context';
 
 const isSSR = typeof window === 'undefined';
 
@@ -64,7 +64,11 @@ const InternalAnimatedRoutes: React.FC<
 export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterProps = {}): React.ReactElement | null {
     const __INTERNAL__ = arguments[2];
     const baseLocation = useLocation();
-    let { parentMatches, parentBase = props.pathnameBase, location: parentLocation } = useContext(ParentMatchesContext);
+    let {
+        parentMatches,
+        parentBase = props.pathnameBase,
+        location: parentLocation
+    } = useContext(AnimatedRouterContext);
 
     let {
         className,
@@ -89,26 +93,26 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
         location = parsePath(location);
     }
 
-    const routeMatches: RouteMatch[] =
-        useMemo(() => {
-            if (__INTERNAL__) {
-                return parentMatches;
-            }
+    parentBase = useMemo(
+        () =>
+            __INTERNAL__
+                ? parentBase
+                : [parentBase, parentMatches?.[parentMatches.length - 1]?.pathnameBase]
+                      .filter(Boolean)
+                      .join('/')
+                      .replace(/\/\/+/g, '/'),
+        [parentMatches, parentBase, __INTERNAL__]
+    );
 
-            // eslint-disable-next-line
-            parentBase = [parentBase, parentMatches?.[parentMatches.length - 1]?.pathnameBase]
-                .filter(Boolean)
-                .join('/')
-                .replace(/\/\/+/g, '/');
-
-            return matchRoutes(routes, location, parentBase);
-        }, [location, routes, parentMatches, __INTERNAL__]) || [];
-
+    const routeMatches = useMemo(
+        () => (__INTERNAL__ ? parentMatches : matchRoutes(routes, location, parentBase)) || [],
+        [location, routes, parentMatches, parentBase, __INTERNAL__]
+    );
     const routeMatch = routeMatches.find(match => routes.includes(match.route));
     const transitionKey = routeMatch && `${routes.indexOf(routeMatch.route)}_${routeMatch.pathnameBase}`;
 
     const children = (
-        <ParentMatchesContext.Provider
+        <AnimatedRouterContext.Provider
             value={{
                 parentMatches: routeMatches,
                 parentBase,
@@ -121,22 +125,29 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
                             <InternalAnimatedRoutes {...props} routes={route.children} location={location} />
                         );
 
-                        return {
-                            ...route,
-                            children: [
-                                {
-                                    element: animatedElement,
-                                    children: route.children
-                                }
-                            ]
-                        };
+                        return typeof route.element === 'undefined'
+                            ? {
+                                  ...route,
+                                  element: cloneElement(animatedElement, {
+                                      component: null
+                                  })
+                              }
+                            : {
+                                  ...route,
+                                  children: [
+                                      {
+                                          element: animatedElement,
+                                          children: route.children
+                                      }
+                                  ]
+                              };
                     }
 
                     return route;
                 }),
                 location
             )}
-        </ParentMatchesContext.Provider>
+        </AnimatedRouterContext.Provider>
     );
 
     const setInTransition = useCallback(
@@ -156,10 +167,14 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
 
     const onEnter = useCallback(
         node => {
+            if (!self.rootNode) {
+                self.rootNode = component ? (document.querySelector(`.${rootNodeId}`) as Element) : node?.parentNode;
+            }
+
             self.inTransition || setInTransition((self.inTransition = true));
             self.lastTransitionNode = node;
         },
-        [self, setInTransition]
+        [self, setInTransition, rootNodeId, component]
     );
 
     const onEntering = useCallback(
@@ -214,12 +229,6 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
     };
     const cls = ['react-animated-router', `${prefix}-container`, rootNodeId, className];
 
-    useEffect(() => {
-        self.rootNode = document.querySelector(`.${rootNodeId}`) as Element;
-
-        self.inTransition && setInTransition(true);
-    }, [rootNodeId, setInTransition, self]);
-
     if (isSSR) {
         return children;
     }
@@ -250,7 +259,7 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
                     );
                 }}
                 unmountOnExit={true}
-                timeout={timeout as any}
+                timeout={timeout}
                 {...cssProps}>
                 {children}
             </CSSTransition>
