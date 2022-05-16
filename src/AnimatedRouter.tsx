@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { createRoutesFromChildren } from 'react-router';
-import { useAnimatedRoutes, InternalAnimatedRoutes, AnimatedRouterProps } from './useAnimatedRoutes';
+import { useAnimatedRoutes, AnimatedRouterProps } from './useAnimatedRoutes';
 import './animate.scss';
 
 export * from './useAnimatedRoutes';
@@ -35,6 +35,8 @@ AnimatedRouter.propTypes = {
     children: PropTypes.node
 };
 
-AnimatedRouter.defaultProps = InternalAnimatedRoutes.defaultProps;
+AnimatedRouter.defaultProps = {
+    prefix: 'animated-router'
+};
 
 export default AnimatedRouter;

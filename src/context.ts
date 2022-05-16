@@ -1,8 +1,11 @@
 import { createContext } from 'react';
-import { Location } from 'react-router';
+import { RouteMatch, Location } from 'react-router';
 
 export const AnimatedRouterContext = createContext<{
-    location?: Partial<Location>;
-}>({});
+    routeMatches: RouteMatch[];
+    location?: Partial<Location> | string;
+}>({
+    routeMatches: []
+});
 
 AnimatedRouterContext.displayName = 'AnimatedRouterContext';

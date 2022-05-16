@@ -1,5 +1,6 @@
 /// <reference types="react" />
-import { Location } from 'react-router';
+import { RouteMatch, Location } from 'react-router';
 export declare const AnimatedRouterContext: import("react").Context<{
-    location?: Partial<Location> | undefined;
+    routeMatches: RouteMatch[];
+    location?: string | Partial<Location> | undefined;
 }>;
