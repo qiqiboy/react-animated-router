@@ -196,13 +196,3 @@ interface AnimatedRouterProps extends TransitionActions {
 
 -   **Q: 动画执行异常？**  
     A: 可以尝试设置 timeout 属性，并保持与动画样式中定义的过渡时间一致（默认的 animate.scss 中为 300）
-
--   **Q: 控制台有警告？**  
-    A: 如果使用路由嵌套，开发环境下在控制台可能会出现如下警告，这不会对实际路由渲染有任何影响。如果有您有更好地实现可以消除该警告，请`PR`
-
-```bash
-router.ts:11 You rendered descendant <Routes> (or called `useRoutes()`) at
-"/invoices/" (under <Route path="">) but the parent route path has no trailing "*".
-This means if you navigate deeper,the parent won't match anymore and
-therefore the child routes will never render.
-```
