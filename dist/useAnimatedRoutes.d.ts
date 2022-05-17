@@ -9,6 +9,15 @@ export interface AnimatedRouterProps extends TransitionActions {
     location?: Partial<Location> | string;
 }
 /**
+ * 给路由节点增加动画支持
+ *
+ * @internal 仅内部调用使用
+ */
+export declare const InternalAnimatedRoutes: React.FC<AnimatedRouterProps & {
+    routes: RouteObject[];
+    children?: React.ReactElement | null;
+}>;
+/**
  * 类似于useRoutes，使用useAnimatedRoutes则可以给该组路由增加切换动画
  *
  * @param routes 路由配置数组

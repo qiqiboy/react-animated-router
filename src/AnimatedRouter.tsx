@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { createRoutesFromChildren } from 'react-router';
-import { useAnimatedRoutes, AnimatedRouterProps } from './useAnimatedRoutes';
+import { useAnimatedRoutes, InternalAnimatedRoutes, AnimatedRouterProps } from './useAnimatedRoutes';
 import './animate.scss';
 
-export * from './useAnimatedRoutes';
+export { useAnimatedRoutes };
 
 /**
  * @desc 路由动画组件
@@ -35,8 +35,6 @@ AnimatedRouter.propTypes = {
     children: PropTypes.node
 };
 
-AnimatedRouter.defaultProps = {
-    prefix: 'animated-router'
-};
+AnimatedRouter.defaultProps = InternalAnimatedRoutes.defaultProps;
 
 export default AnimatedRouter;

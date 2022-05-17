@@ -1,7 +1,7 @@
 import React from 'react';
-import { AnimatedRouterProps } from './useAnimatedRoutes';
+import { useAnimatedRoutes, AnimatedRouterProps } from './useAnimatedRoutes';
 import './animate.scss';
-export * from './useAnimatedRoutes';
+export { useAnimatedRoutes };
 /**
  * @desc 路由动画组件
  * @author qiqiboy

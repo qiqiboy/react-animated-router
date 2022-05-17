@@ -7,6 +7,7 @@ import {
     useRoutes,
     matchRoutes,
     parsePath,
+    renderMatches,
     UNSAFE_RouteContext
 } from 'react-router';
 import { TransitionActions } from 'react-transition-group/Transition';
@@ -48,6 +49,7 @@ const isHistoryPush = (location, update) => {
 
     return lastLocation.isPush;
 };
+const joinPaths = (paths: string[]): string => paths.join('/').replace(/\/\/+/g, '/');
 
 export interface AnimatedRouterProps extends TransitionActions {
     className?: string;
@@ -57,38 +59,20 @@ export interface AnimatedRouterProps extends TransitionActions {
     location?: Partial<Location> | string;
 }
 
-const InternalAnimatedRoutes: React.FC<
+/**
+ * 给路由节点增加动画支持
+ *
+ * @internal 仅内部调用使用
+ */
+export const InternalAnimatedRoutes: React.FC<
     AnimatedRouterProps & {
         routes: RouteObject[];
+        children?: React.ReactElement | null;
     }
-> = ({ routes, ...props }) => {
-    // @ts-ignore
-    return useAnimatedRoutes(routes, props, true);
-};
-
-/**
- * 类似于useRoutes，使用useAnimatedRoutes则可以给该组路由增加切换动画
- *
- * @param routes 路由配置数组
- * @param props 设置项
- */
-export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterProps = {}): React.ReactElement | null {
-    const __INTERNAL__ = arguments[2];
-    const baseLocation = useLocation();
-    const { matches: parentMatches } = useContext(UNSAFE_RouteContext);
-    let { routeMatches, location: contextLocation } = useContext(AnimatedRouterContext);
-
-    let {
-        className,
-        timeout,
-        prefix = 'animated-router',
-        appear,
-        enter,
-        exit,
-        component,
-        location = contextLocation || baseLocation
-    } = props;
+> = ({ routes, children, className, timeout, prefix, appear, enter, exit, component, location }) => {
+    // @TODO replace with useId() hook in react 18
     const [rootNodeId] = useState(() => `${prefix}-root-${Math.random().toString(36).slice(2)}`);
+    const { matches: parentMatches } = useContext(UNSAFE_RouteContext);
     const self = useRef<{
         inTransition: boolean;
         rootNode?: Element;
@@ -97,56 +81,34 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
         inTransition: false
     }).current;
 
-    if (typeof location === 'string') {
-        location = parsePath(location);
-    }
-
-    routeMatches = useMemo(
-        () =>
-            (__INTERNAL__
-                ? routeMatches
-                : matchRoutes(routes, location, parentMatches[parentMatches.length - 1]?.pathnameBase)) || [],
-        [location, routes, parentMatches, routeMatches, __INTERNAL__]
+    const parentMatch = useMemo(() => parentMatches[parentMatches.length - 1] || {}, [parentMatches]);
+    const routeMatches = useMemo(
+        () => matchRoutes(routes, location!, parentMatch.pathnameBase) || [],
+        [location, routes, parentMatch]
     );
+    const transitionKey =
+        routeMatches.length > 0 && `${routes.indexOf(routeMatches[0].route)}_${routeMatches[0].pathnameBase}`;
 
-    const routeMatch = routeMatches.find(match => routes.includes(match.route));
-    const transitionKey = routeMatch && `${routes.indexOf(routeMatch.route)}_${routeMatch.pathnameBase}`;
+    children = useMemo(() => {
+        if (typeof children !== 'undefined') {
+            return children;
+        }
 
-    const children = (
-        <AnimatedRouterContext.Provider
-            value={{
-                routeMatches,
-                location
-            }}>
-            {useRoutes(
-                routes.map(route => {
-                    if (route.children?.length) {
-                        const animatedElement = <InternalAnimatedRoutes {...props} routes={route.children} />;
+        const parentParams = parentMatch.params || {};
+        const parentPathnameBase = parentMatch.pathnameBase || '/';
 
-                        return typeof route.element === 'undefined'
-                            ? {
-                                  ...route,
-                                  element: cloneElement(animatedElement, {
-                                      component: null
-                                  })
-                              }
-                            : {
-                                  ...route,
-                                  children: [
-                                      {
-                                          element: animatedElement,
-                                          children: route.children
-                                      }
-                                  ]
-                              };
-                    }
-
-                    return route;
-                }),
-                location
-            )}
-        </AnimatedRouterContext.Provider>
-    );
+        return renderMatches(
+            routeMatches.map(match => ({
+                ...match,
+                params: { ...parentParams, ...match.params },
+                pathname: joinPaths([parentPathnameBase, match.pathname]),
+                pathnameBase:
+                    match.pathnameBase === '/'
+                        ? parentPathnameBase
+                        : joinPaths([parentPathnameBase, match.pathnameBase])
+            }))
+        );
+    }, [children, parentMatch, routeMatches]);
 
     const setInTransition = useCallback(
         isAdd => {
@@ -230,7 +192,7 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
     };
     const cls = ['react-animated-router', `${prefix}-container`, rootNodeId, className];
 
-    if (isSSR) {
+    if (!children) {
         return children;
     }
 
@@ -262,8 +224,65 @@ export function useAnimatedRoutes(routes: RouteObject[], props: AnimatedRouterPr
                 unmountOnExit={true}
                 timeout={timeout}
                 {...cssProps}>
-                {children}
+                <AnimatedRouterContext.Provider
+                    value={{
+                        location
+                    }}>
+                    {children}
+                </AnimatedRouterContext.Provider>
             </CSSTransition>
         </TransitionGroup>
     );
+};
+
+InternalAnimatedRoutes.defaultProps = {
+    prefix: 'animated-router'
+};
+
+/**
+ * 类似于useRoutes，使用useAnimatedRoutes则可以给该组路由增加切换动画
+ *
+ * @param routes 路由配置数组
+ * @param props 设置项
+ */
+export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterProps): React.ReactElement | null {
+    const baseLocation = useLocation();
+    const { location: contextLocation } = useContext(AnimatedRouterContext);
+    let { location = contextLocation || baseLocation } = props || {};
+
+    location = useMemo(() => (typeof location === 'string' ? parsePath(location) : location), [location]);
+
+    const wrapInternalAnimatedRoutes = (routes: RouteObject[], children?: React.ReactElement | null) => (
+        <InternalAnimatedRoutes {...props} routes={routes} location={location} children={children} />
+    );
+    const injectAnimation = (routes: RouteObject[]): RouteObject[] =>
+        routes.map(route => {
+            if (route.children?.length) {
+                const animatedElement = wrapInternalAnimatedRoutes(injectAnimation(route.children));
+
+                return typeof route.element === 'undefined'
+                    ? {
+                          ...route,
+                          element: cloneElement(animatedElement, {
+                              component: null
+                          })
+                      }
+                    : {
+                          ...route,
+                          children: [
+                              {
+                                  element: animatedElement,
+                                  children: route.children
+                              }
+                          ]
+                      };
+            }
+
+            return route;
+        });
+
+    const animatedRoutes = injectAnimation(routes);
+    const children = useRoutes(animatedRoutes, location);
+
+    return wrapInternalAnimatedRoutes(animatedRoutes, children);
 }
