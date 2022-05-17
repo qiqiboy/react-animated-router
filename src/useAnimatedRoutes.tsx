@@ -81,23 +81,16 @@ export const InternalAnimatedRoutes: React.FC<
         inTransition: false
     }).current;
 
-    const parentMatch = useMemo(() => parentMatches[parentMatches.length - 1] || {}, [parentMatches]);
-    const routeMatches = useMemo(
-        () => matchRoutes(routes, location!, parentMatch.pathnameBase) || [],
-        [location, routes, parentMatch]
-    );
+    const parentMatch = parentMatches[parentMatches.length - 1] || {};
+    const routeMatches = matchRoutes(routes, location!, parentMatch.pathnameBase) || [];
     const transitionKey =
         routeMatches.length > 0 && `${routes.indexOf(routeMatches[0].route)}_${routeMatches[0].pathnameBase}`;
 
-    children = useMemo(() => {
-        if (typeof children !== 'undefined') {
-            return children;
-        }
-
+    if (typeof children === 'undefined') {
         const parentParams = parentMatch.params || {};
         const parentPathnameBase = parentMatch.pathnameBase || '/';
 
-        return renderMatches(
+        children = renderMatches(
             routeMatches.map(match => ({
                 ...match,
                 params: { ...parentParams, ...match.params },
@@ -108,7 +101,7 @@ export const InternalAnimatedRoutes: React.FC<
                         : joinPaths([parentPathnameBase, match.pathnameBase])
             }))
         );
-    }, [children, parentMatch, routeMatches]);
+    }
 
     const setInTransition = useCallback(
         isAdd => {
