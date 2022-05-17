@@ -3,10 +3,12 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import {
     Location,
     RouteObject,
+    NavigationType,
     useLocation,
     useRoutes,
     useNavigationType,
     matchRoutes,
+    createPath,
     parsePath,
     UNSAFE_RouteContext as RouteContext,
     UNSAFE_LocationContext as LocationContext
@@ -15,28 +17,32 @@ import { TransitionActions } from 'react-transition-group/Transition';
 
 const isSSR = typeof window === 'undefined';
 
-let lastLocation = { key: '', isPush: true };
 const REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
 const histories = isSSR ? [] : (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
-const isHistoryPush = (location, update) => {
+let lastLocation = { key: histories[histories.length - 1] || 'default', isPush: true };
+const isHistoryPush = (location: Location, navigationType: NavigationType, update: boolean) => {
     if (isSSR) {
         return true;
     }
 
-    const key = location.key || location.pathname + location.search;
+    const key = location.key || createPath(location);
 
     if (update && key !== lastLocation.key) {
-        const index = histories.lastIndexOf(key);
-        const isPush = index < 0 || index + 1 === histories.length;
+        const lastIndex = histories.lastIndexOf(lastLocation.key);
+        let isPush = true;
 
-        if (isPush) {
-            if (index > -1) {
-                histories.splice(index);
-            }
+        // REPLACE: replace the end key
+        if (navigationType === NavigationType.Replace) {
+            histories.splice(-1, 1, key);
+        } else if (navigationType === NavigationType.Push) {
+            // PUSH: remove from the last key pos, add new key to the end
+            lastIndex > -1 && histories.splice(lastIndex + 1);
 
             histories.push(key);
         } else {
-            histories.splice(index + 1);
+            const index = histories.lastIndexOf(key);
+
+            isPush = lastIndex < index;
         }
 
         sessionStorage.setItem(REACT_HISTORIES_KEY, histories.join(','));
@@ -181,7 +187,9 @@ export const InternalAnimatedRoutes: React.FC<
         <TransitionGroup
             className={cls.filter(Boolean).join(' ')}
             childFactory={child => {
-                const classNames = `${prefix}-${isHistoryPush(location, child.props.in) ? 'forward' : 'backward'}`;
+                const classNames = `${prefix}-${
+                    isHistoryPush(location, navigationType, child.props.in) ? 'forward' : 'backward'
+                }`;
 
                 return cloneElement(child, {
                     classNames

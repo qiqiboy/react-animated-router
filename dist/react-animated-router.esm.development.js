@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useLocation, parsePath, useRoutes, UNSAFE_RouteContext, useNavigationType, matchRoutes, UNSAFE_LocationContext, createRoutesFromChildren } from 'react-router';
+import { useLocation, parsePath, useRoutes, UNSAFE_RouteContext, useNavigationType, matchRoutes, UNSAFE_LocationContext, createPath, NavigationType, createRoutesFromChildren } from 'react-router';
 import React, { useMemo, cloneElement, useState, useContext, useRef, useCallback } from 'react';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
@@ -140,32 +140,33 @@ function _slicedToArray(arr, i) {
 }
 
 var isSSR = typeof window === 'undefined';
-var lastLocation = {
-  key: '',
-  isPush: true
-};
 var REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
 var histories = isSSR ? [] : (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
+var lastLocation = {
+  key: histories[histories.length - 1] || 'default',
+  isPush: true
+};
 
-var isHistoryPush = function isHistoryPush(location, update) {
+var isHistoryPush = function isHistoryPush(location, navigationType, update) {
   if (isSSR) {
     return true;
   }
 
-  var key = location.key || location.pathname + location.search;
+  var key = location.key || createPath(location);
 
   if (update && key !== lastLocation.key) {
-    var index = histories.lastIndexOf(key);
-    var isPush = index < 0 || index + 1 === histories.length;
+    var lastIndex = histories.lastIndexOf(lastLocation.key);
+    var isPush = true; // REPLACE: replace the end key
 
-    if (isPush) {
-      if (index > -1) {
-        histories.splice(index);
-      }
-
+    if (navigationType === NavigationType.Replace) {
+      histories.splice(-1, 1, key);
+    } else if (navigationType === NavigationType.Push) {
+      // PUSH: remove from the last key pos, add new key to the end
+      lastIndex > -1 && histories.splice(lastIndex + 1);
       histories.push(key);
     } else {
-      histories.splice(index + 1);
+      var index = histories.lastIndexOf(key);
+      isPush = lastIndex < index;
     }
 
     sessionStorage.setItem(REACT_HISTORIES_KEY, histories.join(','));
@@ -281,7 +282,7 @@ var InternalAnimatedRoutes = function InternalAnimatedRoutes(_ref) {
   return /*#__PURE__*/React.createElement(TransitionGroup, Object.assign({
     className: cls.filter(Boolean).join(' '),
     childFactory: function childFactory(child) {
-      var classNames = "".concat(prefix, "-").concat(isHistoryPush(location, child.props.in) ? 'forward' : 'backward');
+      var classNames = "".concat(prefix, "-").concat(isHistoryPush(location, navigationType, child.props.in) ? 'forward' : 'backward');
       return cloneElement(child, {
         classNames: classNames
       });
