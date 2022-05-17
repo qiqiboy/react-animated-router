@@ -5,13 +5,13 @@ import {
     RouteObject,
     useLocation,
     useRoutes,
+    useNavigationType,
     matchRoutes,
     parsePath,
-    renderMatches,
-    UNSAFE_RouteContext
+    UNSAFE_RouteContext as RouteContext,
+    UNSAFE_LocationContext as LocationContext
 } from 'react-router';
 import { TransitionActions } from 'react-transition-group/Transition';
-import { AnimatedRouterContext } from './context';
 
 const isSSR = typeof window === 'undefined';
 
@@ -49,7 +49,6 @@ const isHistoryPush = (location, update) => {
 
     return lastLocation.isPush;
 };
-const joinPaths = (paths: string[]): string => paths.join('/').replace(/\/\/+/g, '/');
 
 export interface AnimatedRouterProps extends TransitionActions {
     className?: string;
@@ -72,7 +71,8 @@ export const InternalAnimatedRoutes: React.FC<
 > = ({ routes, children, className, timeout, prefix, appear, enter, exit, component, location }) => {
     // @TODO replace with useId() hook in react 18
     const [rootNodeId] = useState(() => `${prefix}-root-${Math.random().toString(36).slice(2)}`);
-    const { matches: parentMatches } = useContext(UNSAFE_RouteContext);
+    const { matches: parentMatches, outlet } = useContext(RouteContext);
+    const navigationType = useNavigationType();
     const self = useRef<{
         inTransition: boolean;
         rootNode?: Element;
@@ -87,20 +87,7 @@ export const InternalAnimatedRoutes: React.FC<
         routeMatches.length > 0 && `${routes.indexOf(routeMatches[0].route)}_${routeMatches[0].pathnameBase}`;
 
     if (typeof children === 'undefined') {
-        const parentParams = parentMatch.params || {};
-        const parentPathnameBase = parentMatch.pathnameBase || '/';
-
-        children = renderMatches(
-            routeMatches.map(match => ({
-                ...match,
-                params: { ...parentParams, ...match.params },
-                pathname: joinPaths([parentPathnameBase, match.pathname]),
-                pathnameBase:
-                    match.pathnameBase === '/'
-                        ? parentPathnameBase
-                        : joinPaths([parentPathnameBase, match.pathnameBase])
-            }))
-        );
+        children = outlet;
     }
 
     const setInTransition = useCallback(
@@ -217,12 +204,13 @@ export const InternalAnimatedRoutes: React.FC<
                 unmountOnExit={true}
                 timeout={timeout}
                 {...cssProps}>
-                <AnimatedRouterContext.Provider
+                <LocationContext.Provider
                     value={{
-                        location
+                        location: location as Location,
+                        navigationType
                     }}>
                     {children}
-                </AnimatedRouterContext.Provider>
+                </LocationContext.Provider>
             </CSSTransition>
         </TransitionGroup>
     );
@@ -240,10 +228,18 @@ InternalAnimatedRoutes.defaultProps = {
  */
 export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterProps): React.ReactElement | null {
     const baseLocation = useLocation();
-    const { location: contextLocation } = useContext(AnimatedRouterContext);
-    let { location = contextLocation || baseLocation } = props || {};
+    const { location: propLocation = baseLocation } = props || {};
 
-    location = useMemo(() => (typeof location === 'string' ? parsePath(location) : location), [location]);
+    const location: Location = useMemo(
+        () =>
+            propLocation
+                ? {
+                      ...baseLocation,
+                      ...(typeof propLocation === 'string' ? parsePath(propLocation) : propLocation)
+                  }
+                : baseLocation,
+        [baseLocation, propLocation]
+    );
 
     const wrapInternalAnimatedRoutes = (routes: RouteObject[], children?: React.ReactElement | null) => (
         <InternalAnimatedRoutes {...props} routes={routes} location={location} children={children} />
@@ -251,21 +247,23 @@ export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterP
     const injectAnimation = (routes: RouteObject[]): RouteObject[] =>
         routes.map(route => {
             if (route.children?.length) {
-                const animatedElement = wrapInternalAnimatedRoutes(injectAnimation(route.children));
+                const animatedChildren = injectAnimation(route.children);
+                const animatedElement = wrapInternalAnimatedRoutes(animatedChildren);
 
                 return typeof route.element === 'undefined'
                     ? {
                           ...route,
                           element: cloneElement(animatedElement, {
                               component: null
-                          })
+                          }),
+                          children: animatedChildren
                       }
                     : {
                           ...route,
                           children: [
                               {
                                   element: animatedElement,
-                                  children: route.children
+                                  children: animatedChildren
                               }
                           ]
                       };
