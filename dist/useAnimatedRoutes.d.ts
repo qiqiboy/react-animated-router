@@ -13,7 +13,8 @@ export interface AnimatedRouterProps extends TransitionActions {
  *
  * @internal 仅内部调用使用
  */
-export declare const InternalAnimatedRoutes: React.FC<AnimatedRouterProps & {
+export declare const InternalAnimatedRoutes: React.FC<Omit<AnimatedRouterProps, 'location'> & {
+    location: Location;
     routes: RouteObject[];
     children?: React.ReactElement | null;
 }>;

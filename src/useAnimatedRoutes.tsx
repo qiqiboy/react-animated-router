@@ -64,7 +64,8 @@ export interface AnimatedRouterProps extends TransitionActions {
  * @internal 仅内部调用使用
  */
 export const InternalAnimatedRoutes: React.FC<
-    AnimatedRouterProps & {
+    Omit<AnimatedRouterProps, 'location'> & {
+        location: Location;
         routes: RouteObject[];
         children?: React.ReactElement | null;
     }
@@ -206,7 +207,7 @@ export const InternalAnimatedRoutes: React.FC<
                 {...cssProps}>
                 <LocationContext.Provider
                     value={{
-                        location: location as Location,
+                        location,
                         navigationType
                     }}>
                     {children}
@@ -228,8 +229,7 @@ InternalAnimatedRoutes.defaultProps = {
  */
 export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterProps): React.ReactElement | null {
     const baseLocation = useLocation();
-    const { location: propLocation = baseLocation } = props || {};
-
+    const { location: propLocation } = props || {};
     const location: Location = useMemo(
         () =>
             propLocation

@@ -410,8 +410,7 @@ function useAnimatedRoutes(routes, props) {
   var baseLocation = reactRouter.useLocation();
 
   var _ref2 = props || {},
-      _ref2$location = _ref2.location,
-      propLocation = _ref2$location === void 0 ? baseLocation : _ref2$location;
+      propLocation = _ref2.location;
 
   var location = React.useMemo(function () {
     return propLocation ? _objectSpread(_objectSpread({}, baseLocation), typeof propLocation === 'string' ? reactRouter.parsePath(propLocation) : propLocation) : baseLocation;

@@ -319,8 +319,7 @@ function useAnimatedRoutes(routes, props) {
   var baseLocation = useLocation();
 
   var _ref2 = props || {},
-      _ref2$location = _ref2.location,
-      propLocation = _ref2$location === void 0 ? baseLocation : _ref2$location;
+      propLocation = _ref2.location;
 
   var location = useMemo(function () {
     return propLocation ? _objectSpread2(_objectSpread2({}, baseLocation), typeof propLocation === 'string' ? parsePath(propLocation) : propLocation) : baseLocation;
