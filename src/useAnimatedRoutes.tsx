@@ -33,16 +33,16 @@ const isHistoryPush = (location: Location, navigationType: NavigationType, updat
 
         // REPLACE: replace the end key
         if (navigationType === NavigationType.Replace) {
-            histories.splice(-1, 1, key);
+            histories.splice(lastIndex, 1, key);
         } else if (navigationType === NavigationType.Push) {
             // PUSH: remove from the last key pos, add new key to the end
             lastIndex > -1 && histories.splice(lastIndex + 1);
 
             histories.push(key);
         } else {
-            const index = histories.lastIndexOf(key);
+            const newIndex = histories.lastIndexOf(key);
 
-            isPush = lastIndex < index;
+            isPush = lastIndex < newIndex;
         }
 
         sessionStorage.setItem(REACT_HISTORIES_KEY, histories.join(','));
