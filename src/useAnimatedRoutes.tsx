@@ -17,9 +17,9 @@ import { TransitionActions } from 'react-transition-group/Transition';
 
 const isSSR = typeof window === 'undefined';
 
+let lastLocation = { key: 'default', isPush: true };
 const REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
 const histories = isSSR ? [] : (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
-let lastLocation = { key: histories[histories.length - 1] || 'default', isPush: true };
 const isHistoryPush = (location: Location, navigationType: NavigationType, update: boolean) => {
     if (isSSR) {
         return true;
