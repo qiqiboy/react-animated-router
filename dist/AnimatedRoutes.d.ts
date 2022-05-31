@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAnimatedRoutes, AnimatedRouterProps } from './useAnimatedRoutes';
+import { useAnimatedRoutes, AnimatedRoutesProps } from './useAnimatedRoutes';
 import './animate.scss';
 export { useAnimatedRoutes };
 /**
@@ -10,7 +10,7 @@ export { useAnimatedRoutes };
  *  import AnimatedRouter from 'react-animated-router';
  *  import 'react-animated-router/animate.css';
  */
-declare const AnimatedRouter: React.FC<AnimatedRouterProps & {
+export declare const AnimatedRoutes: React.FC<AnimatedRoutesProps & {
     children: React.ReactNode;
 }>;
-export default AnimatedRouter;
+export default AnimatedRoutes;

@@ -8,8 +8,8 @@ react 路由切换动画，支持嵌套路由 (nested routers)和动态路由（
 
 - [安装](#安装)
 - [如何使用](#如何使用)
-    + [`AnimatedRouter`组件模式调用](#animatedrouter组件模式调用)
-    + [`useAnimatedRoutes` Hooks 模式调用](#useanimatedroutes-hooks-模式调用)
+    + [`AnimatedRoutes`组件模式调用](#animatedroutes组件模式调用)
+    + [`useAnimatedRoutes` Hooks 调用](#useanimatedroutes-hooks-调用)
     + [配置参数说明](#配置参数说明)
 - [自定义动画](#自定义动画)
 - [FAQ](#faq)
@@ -25,7 +25,7 @@ npm install react-animated-router@latest --save
 你可以直接通过`npm/yarn`安装，依赖包里带一个左右滑入滑出效果的`animate.css`，如果要使用该效果，需要在项目中一并引入。
 
 ```javascript
-import AnimatedRouter from 'react-animated-router'; //导入我们的的AnimatedRouter组件
+import { AnimatedRoutes, useAnimatedRoutes } from 'react-animated-router'; //导入我们的的AnimatedRoutes组件或者useAnimatedRoutes
 import 'react-animated-router/animate.css'; //导入默认的切换动画样式，如果需要其它切换样式，可以导入自己的动画样式定义文件
 ```
 
@@ -42,24 +42,25 @@ import 'react-animated-router/animate.css'; //导入默认的切换动画样式�
 // 自己项目中的AnimatedRouter模块
 import 'react-animated-router/animate.css'; //导入样式文件
 
-export { default, useAnimatedRoutes } from 'react-animated-router'; //直接将react-animated-router作为默认导出
+export { default } from './AnimatedRoutes'; // 注：这是为了兼容老版本，从v1.2.4开始，AnimatedRoutes支持子导出，但是同时也保留了默认导出语法
+export * from './AnimatedRoutes';
 ```
 
-然后就可以直接引用该文件来使用 AnimatedRouter 了，不必每次都引入`animate.css`。
+然后就可以直接引用该文件来使用 `AnimatedRoutes` 和 `useAnimatedRoutes`了，不必每次都引入`animate.css`。
 
 ### 如何使用
 
 `react-animated-router`提供了与`Routes`和`useRoutes`类似的组件和 hooks 两种用法：
 
-#### `AnimatedRouter`组件模式调用
+#### `AnimatedRoutes`组件模式调用
 
-`AnimatedRouter`是一个标准的 React 组件，它可以给一组`Route`组件增加动画切换效果，将它放入你的项目中，然后在需要支持动画的地方，使用`AnimatedRouter`替换你的`Routes`组件即可。
+`AnimatedRoutes`是一个标准的 React 组件，它可以给一组`Route`组件增加动画切换效果，将它放入你的项目中，然后在需要支持动画的地方，使用`AnimatedRoutes`替换你的`Routes`组件即可。
 
 ```javascript
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useAnimatedRoutes } from 'react-animated-router';
+import { AnimatedRoutes } from 'react-animated-router';
 import 'react-animated-router/animate.css'; //导入默认的切换动画样式，如果需要其它切换样式，可以导入自己的动画样式定义文件
 
 import Login from 'modules/Login';
@@ -68,7 +69,7 @@ import NestLayout from 'modules/NestLayout';
 import Nested from 'modules/Nested';
 
 function App() {
-    /** 假如你的代码如此，则可直接使用最下方代码代替，即直接使用 AnimatedRouter 替换掉 Routes
+    /** 假如你的代码如此，则可直接使用最下方代码代替，即直接使用 AnimatedRoutes 替换掉 Routes
      * return (
      *  <Routes>
      *       <Route path="login" element={<Login />} />
@@ -82,14 +83,14 @@ function App() {
      **/
 
     return (
-        <AnimatedRouter>
+        <AnimatedRoutes>
             <Route path="login" element={<Login />} />
             <Route path="signup" element={<Signup />} />
             <Route path="nested" element={<NestLayout />}>
                 <Route path="1" element={<Nested id="1" />} />
                 <Route path="2" element={<Nested id="2" />} />
             </Route>
-        </AnimatedRouter>
+        </AnimatedRoutes>
     );
 }
 
@@ -101,12 +102,10 @@ render(
 );
 ```
 
-#### `useAnimatedRoutes` Hooks 模式调用
-
-> **请注意，名字是`useAnimatedRoutes`，不是`useAnimatedRouter`!!**
+#### `useAnimatedRoutes` Hooks 调用
 
 ```typescript
-declare function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterProps): React.ReactElement | null;
+declare function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRoutesProps): React.ReactElement | null;
 ```
 
 你可以将项目中的`useRoutes`使用`useAnimatedRoutes`代替，就可以给页面切换带来动画效果！
@@ -115,7 +114,7 @@ declare function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouter
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useAnimatedRoutes } from 'react-animated-router'; //导入我们的的AnimatedRouter组件
+import { useAnimatedRoutes } from 'react-animated-router'; //导入我们的的useAnimatedRoutes hook
 import 'react-animated-router/animate.css'; //导入默认的切换动画样式，如果需要其它切换样式，可以导入自己的动画样式定义文件
 
 import Login from 'modules/Login';
@@ -150,7 +149,7 @@ render(
 
 ```typescript
 // TransitionActions 为 react-transition-group 定义
-interface AnimatedRouterProps extends TransitionActions {
+interface AnimatedRoutesProps extends TransitionActions {
     className?: string;
     timeout?: number;
     prefix?: string;
@@ -161,16 +160,16 @@ interface AnimatedRouterProps extends TransitionActions {
 
 主要参数说明：
 
-|     属性     |           类型            |      默认值       | 描述                                                                                                                                                                                                                                                  |
-| :----------: | :-----------------------: | :---------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|    prefix    |      `string`，可选       | `animated-router` | 应用到 CSSTransition 组件的 classNames 前缀。如果要在同一个项目中使用不同的动画，可以通过设置前缀来定义不同的动画。关于如何自定义动画，请查看下方说明                                                                                                 |
-|   timeout    |      `number`，可选       |        无         | 动画持续时间（毫秒），可以不传，默认为监听 transitionend 时间来判断动画结束。如果有动画异常，可以尝试设置该值，需要注意的是，该值应该与动画样式中定义的过渡时间一致                                                                                   |
-|  className   |      `string`，可选       |        无         | 如果传入 className 则会添加到动画节点所在容器节点上                                                                                                                                                                                                   |
-|  component   |      `boolean`，可选      |       'div'       | AnimatedRouter 默认会 render 一个 div 节点，你可以通过该字段修改 render 的节点类型，例如，`component="section"`将会 render `<section>`节点。在 react v16+中，可以传入 `null` 来避免渲染该节点。                                                       |
-|    appear    |      `boolean`，可选      |       false       | [文档：appear](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-appear)：是否启用组件首次挂载动画（启用的话将会触发 enter 进场动画）                                                                            |
-|    enter     |      `boolean`，可选      |       true        | [文档：enter](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-enter)：是否启用进场动画                                                                                                                         |
-|     exit     |      `boolean`，可选      |       true        | [文档：exit](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-exit)：是否启用离场动画                                                                                                                           |
-|   location   | `Location` `string`，可选 |   当前页面地址    | 等同于`Routes`的同名属性，一般无需指定，除非你要渲染匹配与当前页面地址不一样路由                                                                                                                                                                      |
+|   属性    |           类型            |      默认值       | 描述                                                                                                                                                                                            |
+| :-------: | :-----------------------: | :---------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  prefix   |      `string`，可选       | `animated-router` | 应用到 CSSTransition 组件的 classNames 前缀。如果要在同一个项目中使用不同的动画，可以通过设置前缀来定义不同的动画。关于如何自定义动画，请查看下方说明                                           |
+|  timeout  |      `number`，可选       |        无         | 动画持续时间（毫秒），可以不传，默认为监听 transitionend 时间来判断动画结束。如果有动画异常，可以尝试设置该值，需要注意的是，该值应该与动画样式中定义的过渡时间一致                             |
+| className |      `string`，可选       |        无         | 如果传入 className 则会添加到动画节点所在容器节点上                                                                                                                                             |
+| component |      `boolean`，可选      |       'div'       | AnimatedRoutes 默认会 render 一个 div 节点，你可以通过该字段修改 render 的节点类型，例如，`component="section"`将会 render `<section>`节点。在 react v16+中，可以传入 `null` 来避免渲染该节点。 |
+|  appear   |      `boolean`，可选      |       false       | [文档：appear](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-appear)：是否启用组件首次挂载动画（启用的话将会触发 enter 进场动画）                      |
+|   enter   |      `boolean`，可选      |       true        | [文档：enter](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-enter)：是否启用进场动画                                                                   |
+|   exit    |      `boolean`，可选      |       true        | [文档：exit](http://reactcommunity.org/react-transition-group/transition-group#TransitionGroup-prop-exit)：是否启用离场动画                                                                     |
+| location  | `Location` `string`，可选 |   当前页面地址    | 等同于`Routes`的同名属性，一般无需指定，除非你要渲染匹配与当前页面地址不一样路由                                                                                                                |
 
 ### 自定义动画
 

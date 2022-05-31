@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { createRoutesFromChildren } from 'react-router';
-import { useAnimatedRoutes, InternalAnimatedRoutes, AnimatedRouterProps } from './useAnimatedRoutes';
+import { useAnimatedRoutes, InternalAnimatedRoutes, AnimatedRoutesProps } from './useAnimatedRoutes';
 import './animate.scss';
 
 export { useAnimatedRoutes };
@@ -14,8 +14,8 @@ export { useAnimatedRoutes };
  *  import AnimatedRouter from 'react-animated-router';
  *  import 'react-animated-router/animate.css';
  */
-const AnimatedRouter: React.FC<
-    AnimatedRouterProps & {
+export const AnimatedRoutes: React.FC<
+    AnimatedRoutesProps & {
         children: React.ReactNode;
     }
 > = ({ children, ...props }) => {
@@ -24,7 +24,7 @@ const AnimatedRouter: React.FC<
     return useAnimatedRoutes(routes, props);
 };
 
-AnimatedRouter.propTypes = {
+AnimatedRoutes.propTypes = {
     className: PropTypes.string,
     timeout: PropTypes.number,
     prefix: PropTypes.string,
@@ -35,6 +35,6 @@ AnimatedRouter.propTypes = {
     children: PropTypes.node
 };
 
-AnimatedRouter.defaultProps = InternalAnimatedRoutes.defaultProps;
+AnimatedRoutes.defaultProps = InternalAnimatedRoutes.defaultProps;
 
-export default AnimatedRouter;
+export default AnimatedRoutes;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Location, RouteObject } from 'react-router';
 import { TransitionActions } from 'react-transition-group/Transition';
-export interface AnimatedRouterProps extends TransitionActions {
+export interface AnimatedRoutesProps extends TransitionActions {
     className?: string;
     timeout?: number;
     prefix?: string;
@@ -13,7 +13,7 @@ export interface AnimatedRouterProps extends TransitionActions {
  *
  * @internal 仅内部调用使用
  */
-export declare const InternalAnimatedRoutes: React.FC<Omit<AnimatedRouterProps, 'location'> & {
+export declare const InternalAnimatedRoutes: React.FC<Omit<AnimatedRoutesProps, 'location'> & {
     location: Location;
     routes: RouteObject[];
     children?: React.ReactElement | null;
@@ -24,4 +24,4 @@ export declare const InternalAnimatedRoutes: React.FC<Omit<AnimatedRouterProps, 
  * @param routes 路由配置数组
  * @param props 设置项
  */
-export declare function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterProps): React.ReactElement | null;
+export declare function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRoutesProps): React.ReactElement | null;

@@ -56,7 +56,7 @@ const isHistoryPush = (location: Location, navigationType: NavigationType, updat
     return lastLocation.isPush;
 };
 
-export interface AnimatedRouterProps extends TransitionActions {
+export interface AnimatedRoutesProps extends TransitionActions {
     className?: string;
     timeout?: number;
     prefix?: string;
@@ -70,7 +70,7 @@ export interface AnimatedRouterProps extends TransitionActions {
  * @internal 仅内部调用使用
  */
 export const InternalAnimatedRoutes: React.FC<
-    Omit<AnimatedRouterProps, 'location'> & {
+    Omit<AnimatedRoutesProps, 'location'> & {
         location: Location;
         routes: RouteObject[];
         children?: React.ReactElement | null;
@@ -235,7 +235,7 @@ InternalAnimatedRoutes.defaultProps = {
  * @param routes 路由配置数组
  * @param props 设置项
  */
-export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRouterProps): React.ReactElement | null {
+export function useAnimatedRoutes(routes: RouteObject[], props?: AnimatedRoutesProps): React.ReactElement | null {
     const baseLocation = useLocation();
     const { location: propLocation } = props || {};
     const location: Location = useMemo(

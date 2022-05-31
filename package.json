@@ -1,16 +1,16 @@
 {
   "name": "react-animated-router",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Dynamic transitions with react-router and react-transition-group",
   "author": "qiqiboy",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
-  "types": "dist/AnimatedRouter.d.ts",
+  "types": "dist/AnimatedRoutes.d.ts",
   "engines": {
     "node": ">=10.13.0",
     "tiger-new": "7.3.1"
   },
-  "entryFile": "src/AnimatedRouter.tsx",
+  "entryFile": "src/AnimatedRoutes.tsx",
   "exportName": "react-animated-router",
   "files": [
     "LICENSE",

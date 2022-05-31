@@ -140,12 +140,12 @@ function _slicedToArray(arr, i) {
 }
 
 var isSSR = typeof window === 'undefined';
-var REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
-var histories = isSSR ? [] : (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
 var lastLocation = {
-  key: histories[histories.length - 1] || 'default',
+  key: 'default',
   isPush: true
 };
+var REACT_HISTORIES_KEY = 'REACT_HISTORIES_KEY';
+var histories = isSSR ? [] : (sessionStorage.getItem(REACT_HISTORIES_KEY) || '').split(',').filter(Boolean);
 
 var isHistoryPush = function isHistoryPush(location, navigationType, update) {
   if (isSSR) {
@@ -373,15 +373,14 @@ var _excluded = ["children"];
  *  import 'react-animated-router/animate.css';
  */
 
-var AnimatedRouter = function AnimatedRouter(_ref) {
+var AnimatedRoutes = function AnimatedRoutes(_ref) {
   var children = _ref.children,
       props = _objectWithoutProperties(_ref, _excluded);
 
   var routes = createRoutesFromChildren(children);
   return useAnimatedRoutes(routes, props);
 };
-
-AnimatedRouter.propTypes = {
+AnimatedRoutes.propTypes = {
   className: PropTypes.string,
   timeout: PropTypes.number,
   prefix: PropTypes.string,
@@ -391,6 +390,6 @@ AnimatedRouter.propTypes = {
   component: PropTypes.any,
   children: PropTypes.node
 };
-AnimatedRouter.defaultProps = InternalAnimatedRoutes.defaultProps;
+AnimatedRoutes.defaultProps = InternalAnimatedRoutes.defaultProps;
 
-export { AnimatedRouter as default, useAnimatedRoutes };
+export { AnimatedRoutes, AnimatedRoutes as default, useAnimatedRoutes };
