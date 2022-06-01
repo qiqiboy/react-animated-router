@@ -374,7 +374,7 @@ var InternalAnimatedRoutes = function InternalAnimatedRoutes(_ref) {
     className: cls.filter(Boolean).join(' '),
     childFactory: function childFactory(child) {
       var classNames = "".concat(prefix, "-").concat(isHistoryPush(location, navigationType, child.props.in) ? 'forward' : 'backward');
-      return React.cloneElement(child, {
+      return /*#__PURE__*/React.cloneElement(child, {
         classNames: classNames
       });
     }
@@ -433,7 +433,7 @@ function useAnimatedRoutes(routes, props) {
         var animatedChildren = injectAnimation(route.children);
         var animatedElement = wrapInternalAnimatedRoutes(animatedChildren);
         return typeof route.element === 'undefined' ? _objectSpread(_objectSpread({}, route), {}, {
-          element: React.cloneElement(animatedElement, {
+          element: /*#__PURE__*/React.cloneElement(animatedElement, {
             component: null
           }),
           children: animatedChildren

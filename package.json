@@ -8,7 +8,7 @@
   "types": "dist/AnimatedRoutes.d.ts",
   "engines": {
     "node": ">=10.13.0",
-    "tiger-new": "7.3.1"
+    "tiger-new": "7.3.3"
   },
   "entryFile": "src/AnimatedRoutes.tsx",
   "exportName": "react-animated-router",
@@ -117,7 +117,7 @@
   },
   "devDependencies": {
     "@babel/cli": "7.17.10",
-    "@babel/core": "7.17.10",
+    "@babel/core": "7.18.2",
     "@commitlint/cli": "11.0.0",
     "@commitlint/config-conventional": "11.0.0",
     "@rollup/plugin-babel": "5.3.1",
@@ -136,20 +136,20 @@
     "@types/react-dom": "17.0.17",
     "@types/react-is": "17.0.3",
     "@types/react-transition-group": "^4.2.2",
-    "@typescript-eslint/eslint-plugin": "4.33.0",
-    "@typescript-eslint/parser": "4.33.0",
+    "@typescript-eslint/eslint-plugin": "5.4.0",
+    "@typescript-eslint/parser": "5.4.0",
     "babel-eslint": "10.1.0",
     "babel-jest": "26.6.3",
     "babel-preset-react-app": "10.0.1",
     "eslint": "7.32.0",
     "eslint-config-react-app": "6.0.0",
     "eslint-plugin-flowtype": "5.10.0",
-    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-import": "2.25.3",
     "eslint-plugin-jest": "24.7.0",
     "eslint-plugin-jsx-a11y": "6.5.1",
-    "eslint-plugin-react": "7.29.4",
+    "eslint-plugin-react": "7.30.0",
     "eslint-plugin-react-hooks": "4.5.0",
-    "eslint-plugin-testing-library": "3.10.2",
+    "eslint-plugin-testing-library": "4.12.4",
     "husky": "3.1.0",
     "jest": "26.6.3",
     "jest-environment-jsdom-fourteen": "1.0.1",
@@ -164,7 +164,7 @@
     "react-router": "^6.3.0",
     "react-transition-group": "^4.3.0",
     "rimraf": "3.0.2",
-    "rollup": "2.72.1",
+    "rollup": "2.75.4",
     "rollup-plugin-babel": "4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
     "rollup-plugin-copy": "3.4.0",
@@ -174,6 +174,6 @@
     "rollup-plugin-sass": "1.2.12",
     "rollup-plugin-sourcemaps": "0.4.2",
     "rollup-plugin-terser": "7.0.2",
-    "typescript": "^4.4.4"
+    "typescript": "4.5.5"
   }
 }

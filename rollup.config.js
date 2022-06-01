@@ -28,7 +28,7 @@ const exportName = pkg.exportName || pkg.name.split('/').slice(-1)[0];
 
 function createConfig(env, module) {
     const isProd = env === 'production';
-    const shouldPreserveCss = false;
+    const shouldPreserveCss = false; // module === 'esm';
 
     // for umd globals
     const globals = {
@@ -122,9 +122,21 @@ function createConfig(env, module) {
                         }
                     ],
                     [
+                        require('@babel/plugin-proposal-private-methods').default,
+                        {
+                            loose: true,
+                        },
+                    ],
+                    [
+                        require('@babel/plugin-proposal-private-property-in-object').default,
+                        {
+                            loose: true,
+                        },
+                    ],
+                    [
                         '@babel/plugin-transform-runtime',
                         {
-                            version: require('@babel/helpers/package.json').version,
+                            version: require('@babel/runtime/package.json').version,
                             corejs: false,
                             helpers: true,
                             regenerator: true,
