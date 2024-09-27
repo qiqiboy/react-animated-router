@@ -164,7 +164,7 @@
     "react-router": "^6.3.0",
     "react-transition-group": "^4.3.0",
     "rimraf": "3.0.2",
-    "rollup": "2.75.4",
+    "rollup": "2.79.2",
     "rollup-plugin-babel": "4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
     "rollup-plugin-copy": "3.4.0",
